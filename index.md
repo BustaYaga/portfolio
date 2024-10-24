@@ -1,123 +1,76 @@
+# **Anmol Chaudhary**  
+Cybersecurity Student
+
+[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
+
 ---
-layout: default
+
+## **About Me**
+
+I am currently pursuing a degree in Computer Applications with a strong focus on cybersecurity certifications. Although
+I am just starting my journey, I am passionate about learning and developing my skills in ethical hacking, network
+security, and risk assessment.I am eager to gain hands-on experience and contribute to solving real-world cybersecurity challenges.
+
+
 ---
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+## **Skills**
 
-[Link to another page](./another-page.html).
+[//]: <> (- **Penetration Testing:** Nmap, Metasploit, Burp Suite, Wireshark)
+[//]: <> (- **Network Security:** Firewalls, IDS/IPS, VPN, Network Protocols)
+[//]: <> (- **Web Security:** OWASP Top 10, SQL Injection, Cross-Site Scripting (XSS))
+[//]: <> (- **Digital Forensics:** Autopsy, FTK, EnCase)
+- **Programming Languages:** C, C++
+- **Operating Systems:** Linux (Kali, Ubuntu), Windows
+- **Cloud Security:** Azure Security Tools
+- **Compliance and Governance:** GDPR, NIST, ISO 27001
 
-There should be whitespace between paragraphs.
+---
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+## **Certifications**
 
-# Header 1
+- **[Google Cybersecurity Professional Certificate](https://www.coursera.org/professional-certificates/google-cybersecurity) - *In Progress***
+- **CompTIA Security+** - *Expected 2025*
+- **Certified Ethical Hacker (CEH) - *Expected 2025***
+[//]: <> (- **Cisco Certified CyberOps Associate**)
 
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
+---
 
-## Header 2
+## **Projects**
 
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
+### **1. Vulnerability Assessment of Web Applications**
+**Tools:** Burp Suite, OWASP ZAP, Nmap  
+**Description:** Conducted vulnerability assessments on real-world web applications to identify critical security flaws. Successfully identified and mitigated SQL Injection and Cross-Site Scripting (XSS) vulnerabilities.
 
-### Header 3
+- Wrote detailed vulnerability reports including risk assessments and remediation strategies.
+- Followed the OWASP Top 10 framework for web application security.
 
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
+### **2. Network Penetration Testing Lab**
+**Tools:** Metasploit, Wireshark, Kali Linux  
+**Description:** Designed and deployed a penetration testing lab environment to simulate network attacks, including port scanning, exploit development, and privilege escalation.
 
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
+- Implemented firewall rules to strengthen network security.
+- Created reports summarizing attack vectors and prevention techniques.
 
-#### Header 4
+### **3. Automated Malware Analysis**
+**Tools:** Python, YARA, VirusTotal API  
+**Description:** Developed a Python script to automate malware analysis by scanning files with YARA signatures and utilizing VirusTotal API for threat intelligence.
 
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
+- Improved efficiency by reducing manual analysis time.
+- Identified multiple zero-day threats in testing environments.
 
-##### Header 5
+---
 
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
+## **Education**
 
-###### Header 6
+**Bachelor of Computer Applications** (In Progress)  
+Graphic Era Hill University  
+2022 – Present
 
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
+---
 
-### There's a horizontal rule below this.
+## **Contact**
 
-* * *
+Feel free to reach out to me for any project collaboration, queries, or opportunities in the cybersecurity field.
 
-### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![Octocat](https://github.githubassets.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![Branching](https://guides.github.com/activities/hello-world/branching.png)
-
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-```
-
-```
-The final element.
-```
+[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
