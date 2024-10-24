@@ -1,7 +1,14 @@
-![Email](email_black.png) | ![LinkedIn](linkedin_black.png) | ![GitHub](github_black.png)
-
-[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
-
+<p align="center">
+  <a href="mailto:anmolchaudhary8317@gmail.com">
+    <img src="email_black.png" alt="Email">
+  </a>
+  <a href="www.linkedin.com/in/anmol-chaudhary-67b41124a">
+    <img src="linkedin_black.png" alt="LinkedIn">
+  </a>
+  <a href="[https://linktothirdwebsite.co](https://github.com/BustaYaga)">
+    <img src="github_black.png" alt="Github">
+  </a>
+</p>
 ---
 
 ## **About Me**
