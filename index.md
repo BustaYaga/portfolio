@@ -1,4 +1,4 @@
-![Octocat](../images/email_black.png)[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
+![Octocat](email_black.png)[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
 
 ---
 
