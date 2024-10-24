@@ -1,4 +1,4 @@
-[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
+![Octocat](../images/email_black.png)[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
 
 ---
 
@@ -15,7 +15,7 @@ security, and risk assessment.I am eager to gain hands-on experience and contrib
 
 [//]: <> (- **Penetration Testing:** Nmap, Metasploit, Burp Suite, Wireshark)
 [//]: <> (- **Network Security:** Firewalls, IDS/IPS, VPN, Network Protocols)
-[//]: <> (- **Web Security:** OWASP Top 10, SQL Injection, Cross-Site Scripting (XSS))
+[//]: <> (- **Web Security:** OWASP Top 10, SQL Injection, Cross-Site Scripting or XSS)
 [//]: <> (- **Digital Forensics:** Autopsy, FTK, EnCase)
 - **Programming Languages:** C, C++
 - **Operating Systems:** Linux (Kali, Ubuntu), Windows
