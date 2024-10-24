@@ -1,6 +1,3 @@
-# **Anmol Chaudhary**  
-Cybersecurity Student
-
 [Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
 
 ---
@@ -73,4 +70,4 @@ Graphic Era Hill University
 
 Feel free to reach out to me for any project collaboration, queries, or opportunities in the cybersecurity field.
 
-[Email](mailto:anmolchaudhary8317@gmail.com) | [LinkedIn](www.linkedin.com/in/anmol-chaudhary-67b41124a) | [GitHub](https://github.com/BustaYaga)
+Email: [anmolchaudhary8317@gmail.com](mailto:anmolchaudhary8317@gmail.com):| LinkedIn[www.linkedin.com/in/anmol-chaudhary-67b41124a](www.linkedin.com/in/anmol-chaudhary-67b41124a) | Github: [https://github.com/BustaYaga](https://github.com/BustaYaga)
