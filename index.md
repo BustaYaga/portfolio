@@ -9,7 +9,6 @@
     <img src="github_black.png" alt="Github">
   </a>
 </p>
----
 
 ## **About Me**
 
