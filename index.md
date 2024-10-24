@@ -2,10 +2,10 @@
   <a href="mailto:anmolchaudhary8317@gmail.com">
     <img src="email_black.png" alt="Email">
   </a>
-  <a href="www.linkedin.com/in/anmol-chaudhary-67b41124a">
+  <a href="https://linkedin.com/in/anmol-chaudhary-67b41124a">
     <img src="linkedin_black.png" alt="LinkedIn">
   </a>
-  <a href="[https://linktothirdwebsite.co](https://github.com/BustaYaga)">
+  <a href="https://github.com/BustaYaga">
     <img src="github_black.png" alt="Github">
   </a>
 </p>
