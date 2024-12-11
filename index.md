@@ -16,7 +16,6 @@ I am currently pursuing a degree in Computer Applications with a strong focus on
 I am just starting my journey, I am passionate about learning and developing my skills in ethical hacking, network
 security, and risk assessment.I am eager to gain hands-on experience and contribute to solving real-world cybersecurity challenges.
 
-
 ---
 
 ## **Skills**
