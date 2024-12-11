@@ -64,7 +64,7 @@ security, and risk assessment.I am eager to gain hands-on experience and contrib
 - Improved efficiency by reducing manual analysis time.
 - Identified multiple zero-day threats in testing environments.
 
-### **4. Microsoft Sentinel Deployment and Log Analysis
+### **4. Microsoft Sentinel Deployment and Log Analysis**
 
 **Tools:** Microsoft Sentinel, Microsoft Azure
 **Description:** Deployed Microsoft Sentinel on a virtual machine using Microsoft Azure to monitor, analyze, and respond to security incidents in a cloud environment.
