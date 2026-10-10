@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Example — writeup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 760px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); }
+  .wu-meta { display: flex; gap: 10px; margin: 14px 0 32px; }
+  .wu h1 { font-size: 1.6rem; margin: 14px 0 4px; }
+  .wu h2 { font-size: 1.05rem; margin: 32px 0 10px; color: var(--accent); }
+  .wu p { color: var(--text); max-width: 68ch; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.85rem;
+    color: var(--ok);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface); padding: 1px 5px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span></a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to writeups</a>
+  <h1>Example</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-easy">Easy</span>
+  </div>
+
+  <p>
+    Short intro — what kind of box this is, the general attack path in one sentence,
+    without spoiling the fun part yet.
+  </p>
+
+  <h2>Recon</h2>
+  <p>Start with an nmap scan. Replace this with your real output and findings.</p>
+  <pre>nmap -sC -sV -oN nmap/initial.txt 10.10.10.x</pre>
+
+  <h2>Enumeration</h2>
+  <p>What you found poking at the open ports/services, and how you got from there to a foothold angle.</p>
+
+  <h2>Foothold</h2>
+  <p>How you got initial shell access. Include the payload/command and what it exploited.</p>
+
+  <h2>Privilege Escalation</h2>
+  <p>The path from low-priv to root/SYSTEM. Walk through your reasoning, not just the final command.</p>
+
+  <h2>Lessons</h2>
+  <p>One or two sentences on what this box taught you or what you'd do differently next time.</p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

