@@ -37,3 +37,29 @@ export class PortfolioApp {
 }
 
 export default PortfolioApp;
+
+// -------------------------------------------------------------
+// BOOTSTRAP
+// Nothing above this point ever ran in the browser: the class was
+// defined and exported, but no instance was created and init()
+// was never called. This is what actually starts the app.
+// -------------------------------------------------------------
+function bootstrap() {
+  const app = new PortfolioApp();
+  app.init();
+
+  // Exposed for debugging/parity with the legacy bundle (window.PortfolioPackage)
+  if (typeof window !== 'undefined') {
+    window.PortfolioApp = app;
+  }
+
+  return app;
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrap);
+  } else {
+    bootstrap();
+  }
+}
