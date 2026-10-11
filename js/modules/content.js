@@ -18,16 +18,16 @@ export const PORTFOLIO_CONTENT = {
   // Recruiter panel summary
   recruiter: {
     summary:
-      "I'm <strong>Anmol Chaudhary</strong>, a Computer Applications graduate specializing in <strong>Cybersecurity (Offensive Security / SOC Analysis)</strong> and <strong>Software Development</strong> based in <strong>Dehradun, India</strong>. I have practical, hands-on experience through 20+ HackTheBox labs covering web exploitation, Active Directory penetration testing (Kerberos, BloodHound), network forensics (Wireshark PCAP analysis), CVE research, and cloud threat detection with Microsoft Sentinel (KQL). I'm seeking an entry-level role where I can contribute to securing critical infrastructure or developing reliable systems.",
+      "<p>I'm <strong>Anmol Chaudhary</strong>, a Computer Applications graduate specializing in <strong>Cybersecurity (Offensive Security / SOC Analysis)</strong> and <strong>Software Development</strong> based in <strong>Dehradun, India</strong>.<br>I have practical, hands-on experience through various labs covering web exploitation, Active Directory penetration testing (Kerberos, BloodHound), network forensics (Wireshark PCAP analysis), CVE research, and cloud threat detection with Microsoft Sentinel (KQL).<br>I'm seeking an entry-level role where I can contribute to securing critical infrastructure or developing reliable systems.</p>",
   },
 
   // About me paragraphs
-  about: {
-    intro:
-      "I'm <strong>Anmol Chaudhary</strong> — a Computer Applications graduate (BCA, Rabindranath Tagore University) passionate about dissecting network protocols, offensive security, and system engineering. My practical foundation comes from compromising 20+ HackTheBox machines spanning web applications, Active Directory domains, and network forensics.",
-    goals:
-      "Currently mastering Active Directory privilege escalation chains, cloud detection engineering using Microsoft Sentinel with KQL, and modern web application security. Looking for an entry-level role in Cybersecurity (SOC Analyst, Junior Penetration Tester, Security Engineer) or Software Engineering.",
-  },
+  
+  skills: {
+    skill:
+      // "Currently mastering Active Directory privilege escalation chains, cloud detection engineering using Microsoft Sentinel with KQL, and modern web application security. Looking for an entry-level role in Cybersecurity (SOC Analyst, Junior Penetration Tester, Security Engineer) or Software Engineering.",
+      '<p>Constantly evolving, forever learning, always building.<br><span class="font-binary-accent">[OFFENSIVE SECURITY]</span> Burp Suite, Metasploit, BloodHound, NetExec, Gobuster, Hydra, Hashcat, LinPEAS, Python Exploit Scripting<br><span class="font-binary-green">[DEFENSIVE / SOC & SIEM]</span> Microsoft Sentinel, KQL (Kusto Query Language), SIEM Log Triage, MITRE ATT&CK, IOC Hunting<br><span class="font-binary">[NETWORKING & FORENSICS]</span> Wireshark PCAP & TCP Stream Analysis, TCP/IP, DNS, DHCP, VLANs, Subnetting, OSI Model<br><span class="font-binary-accent">[SYSTEMS & DEVELOPMENT]</span> Python, Bash, SQL, Linux (Kali/Ubuntu), Windows Server, Active Directory, Docker, Git, Azure</p>',
+    },
 
   // Project descriptions
   projects: {
@@ -43,7 +43,7 @@ export const PORTFOLIO_CONTENT = {
 
   // Writeups directory subtitle
   writeups: {
-    sub: 'Detailed writeups of completed Hack The Box machines covering web exploitation, Active Directory, and privilege escalation. Click a row to read.',
+    sub: 'Detailed writeups of solved machines and labs covering various vulnerabilities and exploitation techniques. Click a row to read.',
   },
 
   // Resume section instruction

@@ -46,7 +46,7 @@ export class Terminal {
         '<span class="font-binary">[02]</span> <strong>about</strong>       : bio, education & goals',
         '<span class="font-binary">[03]</span> <strong>skills</strong>      : offensive/defensive stack & tools',
         '<span class="font-binary">[04]</span> <strong>projects</strong>    : open lab & engineering projects',
-        '<span class="font-binary">[05]</span> <strong>writeups</strong>    : HTB writeups directory (6 boxes)',
+        '<span class="font-binary">[05]</span> <strong>writeups</strong>    : HTB writeups directory',
         '<span class="font-binary">[06]</span> <strong>resume</strong>      : view & download resumes',
         '<span class="font-binary">[07]</span> <strong>certs</strong>       : practical lab credentials & degrees',
         '<span class="font-binary">[08]</span> <strong>contact</strong>     : ways to reach me',
@@ -58,24 +58,15 @@ export class Terminal {
 
     this.registerCommand('whoami', () => ({
       print: [
-        'Hi, Anmol Chaudhary. A Cybersecurity Researcher & Developer seeking entry-level roles',
-        'BCA Graduate (Rabindranath Tagore University) | 20+ HackTheBox Machines Pwned',
-        'Focus: Active Directory attacks, Network forensics, CVE exploitation & Microsoft Sentinel (KQL)',
+        "Hi, I'm Anmol Chaudhary. A Cybersecurity Researcher & Developer seeking entry-level roles",
+        // 'BCA Graduate (Rabindranath Tagore University)',
+        // 'Focus: Active Directory attacks, Network forensics, CVE exploitation & Microsoft Sentinel (KQL)',
       ],
     }));
 
     this.registerCommand('skills', () => ({
-      print: [
-        '<span class="font-binary-accent">[OFFENSIVE SECURITY]</span> Burp Suite, Metasploit, BloodHound, NetExec, Gobuster, Hydra, Hashcat, LinPEAS, Python Exploit Scripting',
-        '<span class="font-binary-green">[DEFENSIVE / SOC & SIEM]</span> Microsoft Sentinel, KQL (Kusto Query Language), SIEM Log Triage, MITRE ATT&CK, IOC Hunting',
-        '<span class="font-binary">[NETWORKING & FORENSICS]</span> Wireshark PCAP & TCP Stream Analysis, TCP/IP, DNS, DHCP, VLANs, Subnetting, OSI Model',
-        '<span class="font-binary-accent">[SYSTEMS & DEVELOPMENT]</span> Python, Bash, SQL, Linux (Kali/Ubuntu), Windows Server, Active Directory, Docker, Git, Azure',
-      ],
-    }));
-
-    this.registerCommand('about', () => ({
-      panel: 'about',
-      print: ['opening about.md below ↓'],
+      panel: 'skills',
+      print: ['opening ./skills ↓'],
     }));
 
     this.registerCommand('projects', () => ({
@@ -323,11 +314,9 @@ export class Terminal {
 
     this.clear();
     this.printLine(`<pre class="ascii-banner">${ASCII_BANNER}</pre>`);
-    this.printLine('<span class="font-binary-green">[SEC_CORE_READY]</span> <span class="font-binary">OPERATOR: ANMOL CHAUDHARY // 20+ HTB MACHINES PWNED</span>', 'diag-line');
+    this.printLine('<span class="font-binary-green">[SEC_CORE_READY]</span> <span class="font-binary">OPERATOR: ANMOL CHAUDHARY</span>', 'diag-line');
     this.printLine('anmol@portfolio:~$ whoami', 'prompt-line');
-    this.printLine('Anmol Chaudhary — Cybersecurity Researcher & Developer', 'out');
-    this.printLine('anmol@portfolio:~$ help', 'prompt-line');
-    this.runCommand('help');
+    this.printLine("Hi, I'm Anmol Chaudhary — A Cybersecurity Researcher & Developer seeking entry-level jobs", 'diag-line');
     this.focus();
   }
 
@@ -381,55 +370,86 @@ export class Terminal {
       this.printLine('<span class="font-binary-green">[SYSTEM ONLINE]</span> <span class="font-binary">SHELL INITIALIZED // ACCESSIBILITY: WCAG 2.1 AA</span>', 'diag-line');
     }, 450);
 
-    // Phase 4: Typewriter prompt for whoami
+    // Phase 4: Typewriter prompt for whoami & response
     addStep(() => {
-      const p = document.createElement('p');
+      // 1. Create Whoami Prompt Line
+      const p1 = document.createElement('p');
       const promptSpan = document.createElement('span');
       promptSpan.className = 'prompt';
-      promptSpan.textContent = 'anmol@portfolio:~$';
-      p.appendChild(promptSpan);
-      p.appendChild(document.createTextNode(' '));
+      promptSpan.textContent = 'anmol@portfolio:~$ ';
+      p1.appendChild(promptSpan);
 
       const cmdSpan = document.createElement('span');
-      p.appendChild(cmdSpan);
-      const cursor = document.createElement('span');
-      cursor.className = 'type-cursor';
-      p.appendChild(cursor);
-      this.outputEl.appendChild(p);
+      p1.appendChild(cmdSpan);
+
+      const cursor1 = document.createElement('span');
+      cursor1.className = 'type-cursor';
+      p1.appendChild(cursor1);
+
+      this.outputEl.appendChild(p1);
 
       const targetCmd = 'whoami';
-      let charIdx = 0;
+      let charIdx1 = 0;
 
-      const typeNext = () => {
+      // Typewriter function for 'whoami'
+      const typeCommand = () => {
         if (!this.bootActive) return;
-        if (charIdx < targetCmd.length) {
-          cmdSpan.textContent += targetCmd[charIdx];
-          charIdx++;
-          const t = setTimeout(typeNext, speed + Math.random() * 20);
+        if (charIdx1 < targetCmd.length) {
+          cmdSpan.textContent += targetCmd[charIdx1++];
+          const t = setTimeout(typeCommand, speed + Math.random() * 20);
           this.bootTimeouts.push(t);
         } else {
-          cursor.remove();
-          const t2 = setTimeout(() => {
+          cursor1.remove(); // Remove cursor from prompt line
+          
+          const tPause = setTimeout(() => {
             if (!this.bootActive) return;
-            this.printLine('Anmol Chaudhary — Cybersecurity Researcher & Developer', 'out');
 
-            // Type help command
-            const t3 = setTimeout(() => {
+            // 2. Create Response Output Line with its own typewriter effect
+            const p2 = document.createElement('p');
+            p2.className = 'out';
+
+            const respSpan = document.createElement('span');
+            p2.appendChild(respSpan);
+
+            const cursor2 = document.createElement('span');
+            cursor2.className = 'type-cursor';
+            p2.appendChild(cursor2);
+
+            this.outputEl.appendChild(p2);
+
+            const targetResp = "Hi, I'm Anmol Chaudhary — A Cybersecurity Researcher & Developer";
+            let charIdx2 = 0;
+
+            const typeResponse = () => {
               if (!this.bootActive) return;
-              this.printLine('Use help for list of commands. Type recruiter to enter recruiter mode');
-              this.bootActive = false;
-              if (this.skipBtn) this.skipBtn.style.display = 'none';
-              this.focus();
-              if (onComplete) onComplete();
-            }, 300);
-            this.bootTimeouts.push(t3);
+              if (charIdx2 < targetResp.length) {
+                respSpan.textContent += targetResp[charIdx2++];
+                const t2 = setTimeout(typeResponse, speed + Math.random() * 15);
+                this.bootTimeouts.push(t2);
+              } else {
+                cursor2.remove(); // Remove cursor after finished typing
+
+                // Type help instructions
+                const tHelp = setTimeout(() => {
+                  if (!this.bootActive) return;
+                  this.printLine('Use help for list of commands. Type recruiter to enter recruiter mode');
+                  this.bootActive = false;
+                  if (this.skipBtn) this.skipBtn.style.display = 'none';
+                  this.focus();
+                  if (onComplete) onComplete();
+                }, 300);
+                this.bootTimeouts.push(tHelp);
+              }
+            };
+
+            typeResponse();
           }, 200);
-          this.bootTimeouts.push(t2);
+          this.bootTimeouts.push(tPause);
         }
       };
 
-      typeNext();
-    }, 400);
+      typeCommand();
+    }, 450);
   }
 
   focus() {
