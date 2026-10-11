@@ -213,6 +213,9 @@ body[data-terminal="off"] .nav-recruiter {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 0 0 1px rgba(255, 106, 26, 0.08), 0 20px 60px -30px rgba(0,0,0,0.6);
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
 }
 .terminal-bar {
   display: flex;
@@ -254,9 +257,9 @@ body[data-terminal="off"] .nav-recruiter {
   padding: 22px 20px 26px;
   font-family: var(--mono);
   font-size: 0.95rem;
-  min-height: 160px;
+  min-height: 300px;
   overflow-y: auto;
-  max-height: 380px;
+  max-height: 400px;
   background: radial-gradient(circle at 50% 20%, rgba(35, 27, 20, 0.5) 0%, rgba(21, 19, 16, 0.98) 100%);
 }
 .terminal-body::before {
