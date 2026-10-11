@@ -51,13 +51,6 @@ export const PORTFOLIO_CONTENT = {
     note: 'Download verified resumes tailored for Network Security & Cybersecurity or Software Development.',
   },
 
-  // Certifications card description
-  certs: {
-    cert1: 'HackTheBox Labs — 20+ Machines Pwned (Web Exploitation, Active Directory, Network Forensics, CVE Research)',
-    cert2: 'Bachelor of Computer Application (BCA) — Rabindranath Tagore University (2022 – 2025)',
-    cert3: 'Cloud SIEM & Threat Hunting Lab — Microsoft Azure Sentinel & KQL Analytics',
-  },
-
   // Footer tagline and copyright
   footer: {
     tagline:
@@ -72,6 +65,24 @@ export const PORTFOLIO_CONTENT = {
     ],
   },
 };
+
+
+export const CERTIFICATIONS = [
+  {
+    id: 'opsec',
+    name: 'Opsec- Privacy for Security Professionals',
+    issuer: 'Just Hacking Training',
+    date: 'September 19, 2026',
+    file: 'certs/opsec_privacy_certificate.pdf',
+  },
+  {
+    id: 'bca-degree',
+    name: 'Bachelor of Computer Application (BCA)',
+    issuer: 'Rabindranath Tagore University',
+    date: '2022 – 2025',
+    file: 'certs/bca-degree.pdf',
+  }
+];
 
 /**
  * Resolves a nested dot-notation path on an object (e.g. 'about.intro').

@@ -273,20 +273,17 @@
 
   <div class="panel" id="panel-certs" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> ls ./certs</h2>
-    <div class="card-grid">
-      <article class="card">
-        <h3>HackTheBox Lab Pwns</h3>
-        <p data-content="certs.cert1"></p>
-        <div class="card-links"><a href="https://app.hackthebox.com/profile/bustayaga" target="_blank" rel="noopener">verify htb profile →</a></div>
-      </article>
-      <article class="card">
-        <h3>Bachelor of Computer Application</h3>
-        <p data-content="certs.cert2"></p>
-      </article>
-      <article class="card">
-        <h3>Cloud SIEM Deployment</h3>
-        <p data-content="certs.cert3"></p>
-      </article>
+    <p class="section-sub">Click a row to open the certificate PDF. Drop files into <code>/certs</code> to populate this list.</p>
+
+    <div class="cert-table" role="table">
+      <div class="cert-row cert-head" role="row">
+        <span role="columnheader">certification</span>
+        <span role="columnheader">issuer</span>
+        <span role="columnheader">date</span>
+        <span role="columnheader"></span>
+      </div>
+      <div id="certTableBody" role="rowgroup"></div>
+      <p class="cert-empty" id="certEmptyState" hidden>no certifications uploaded yet — this is a prototype.</p>
     </div>
   </div>
 
@@ -305,6 +302,19 @@
 <footer class="footer">
   <p data-content="footer.tagline">&copy; <span id="year"></span> Anmol Chaudhary — built with nothing but HTML, CSS, and curiosity.</p>
 </footer>
+
+<!-- ============ CERTIFICATION PDF VIEWER ============ -->
+<div class="cert-viewer" id="certViewer" hidden>
+  <div class="cert-viewer-backdrop" id="certViewerBackdrop"></div>
+  <div class="cert-viewer-box">
+    <div class="cert-viewer-bar">
+      <span class="cert-viewer-title" id="certViewerTitle">certificate.pdf</span>
+      <a id="certViewerDownload" class="cert-viewer-download" href="#" download>download</a>
+      <button class="cert-viewer-close" id="certViewerClose" type="button" aria-label="Close certificate viewer">✕</button>
+    </div>
+    <iframe id="certViewerFrame" class="cert-viewer-frame" title="Certificate PDF viewer"></iframe>
+  </div>
+</div>
 
 <script type="module" src="js/index.js"></script>
 </body>

@@ -83,20 +83,28 @@ export class Terminal {
       print: ['opening ./projects below ↓'],
     }));
 
-    this.registerCommand('writeups', () => ({
-      panel: 'writeups',
-      print: ['opening ./writeups archive (6 HTB machines) below ↓'],
-    }));
+    this.registerCommand('writeups', () => {
+      const count = document.querySelectorAll('#panel-writeups .wt-row:not(.wt-head)').length;
+      const label = count === 1 ? 'HTB machine' : 'HTB machines';
+      return {
+        panel: 'writeups',
+        print: [`opening ./writeups consisting (${count} ${label})`],
+      };
+    });
 
     this.registerCommand('resume', () => ({
       panel: 'resume',
-      print: ['opening resume.sh below ↓'],
+      print: ['opening resume.sh'],
     }));
 
-    this.registerCommand('certs', () => ({
-      panel: 'certs',
-      print: ['opening ./certs below ↓'],
-    }));
+    this.registerCommand('certs', () => {
+      const count = document.querySelectorAll('#panel-certs .cert-row').length;
+      const label = count === 1 ? 'certification' : 'certifications';
+      return {
+        panel: 'certs',
+        print: [`opening ./certs — fetched ${count} ${label} below ↓`],
+      };
+    });
 
     this.registerCommand('contact', () => ({
       panel: 'contact',
