@@ -58,7 +58,7 @@ export class Terminal {
 
     this.registerCommand('whoami', () => ({
       print: [
-        'Anmol Chaudhary — Cybersecurity Researcher & Developer',
+        'Hi, Anmol Chaudhary. A Cybersecurity Researcher & Developer seeking entry-level roles',
         'BCA Graduate (Rabindranath Tagore University) | 20+ HackTheBox Machines Pwned',
         'Focus: Active Directory attacks, Network forensics, CVE exploitation & Microsoft Sentinel (KQL)',
       ],
@@ -363,7 +363,7 @@ export class Terminal {
     addStep(() => {
       const p = this.printLine('<span class="bin-tag">[DECRYPT]</span> <span class="bin-stream">01000001 01101110 01101101 01101111 01101100</span>', 'diag-line');
       if (p) {
-        this.scrambleDecode('&gt;&gt; IDENTITY VERIFIED: ANMOL CHAUDHARY [HTB: 20+ PWNED]', p, 700);
+        this.scrambleDecode('&gt;&gt; IDENTITY VERIFIED: ANMOL CHAUDHARY', p, 700);
       }
     }, 850);
 
@@ -408,8 +408,7 @@ export class Terminal {
             // Type help command
             const t3 = setTimeout(() => {
               if (!this.bootActive) return;
-              this.printLine('anmol@portfolio:~$ help', 'prompt-line');
-              this.runCommand('help');
+              this.printLine('Use help for list of commands. Type recruiter to enter recruiter mode');
               this.bootActive = false;
               if (this.skipBtn) this.skipBtn.style.display = 'none';
               this.focus();
