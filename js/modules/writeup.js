@@ -14,7 +14,7 @@
  * touching — no HTML edits, no copy-pasted markup per page.
  */
 
-import { WRITEUP_STATUS } from "./config";
+import { WRITEUP_STATUS } from "./config.js";
 
 function getMachineId() {
   return location.pathname.split('/').pop().replace('.html', '').toLowerCase();
