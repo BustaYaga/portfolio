@@ -3,6 +3,11 @@
  * Global tokens, MITRE ATT&CK datasets, and default settings.
  */
 
+export const GITHUB_REPO = {
+  owner: 'BustaYaga',
+  repo: 'vuln-scanner', // update if the repo name/case differs
+};
+
 export const WRITEUP_STATUS = {
   layover: 'locked',
   kobold: 'missing',
@@ -23,24 +28,8 @@ export const BOOT_DIAGNOSTICS = [
   { bin: '01010100', tag: 'CIPHER', text: '01000001 01101110 01101101 01101111 01101100', status: 'DECRYPTED' },
 ];
 
-// export const ASCII_BANNER = `  █████╗ ███╗   ██╗███╗   ███╗ ██████╗ ██╗     
-//  ██╔══██╗████╗  ██║████╗ ████║██╔═══██╗██║     
-//  ███████║██╔██╗ ██║██╔████╔██║██║   ██║██║     
-//  ██╔══██║██║╚██╗██║██║╚██╔╝██║██║   ██║██║     
-//  ██║  ██║██║ ╚████║██║ ╚═╝ ██║╚██████╔╝███████╗`;
- 
- export const ASCII_BANNER = `  ▄▄                                                                          
- ▄██                           ██                                             
-  ██                           ██                                             
-  ██▄████▄ ▀███  ▀███  ▄██▀████████ ▄█▀██▄ ▀██▀   ▀██▀▄█▀██▄  ▄█▀█████▄█▀██▄  
-  ██    ▀██  ██    ██  ██   ▀▀ ██  ██   ██   ██   ▄█ ██   ██ ▄██  ██ ██   ██  
-  ▓█     ██  ▓█    ██  ▀█████▄ ██   ▄███▓█    ██ ▄▓   ▄███▓█ ▀▓▓███▀  ▄███▓█  
-  ▓▓▓   ▄█▓  ▓█    █▓       ██ █▓  █▓   ▓█     ██▓   █▓   ▓█ █▓      █▓   ▓█  
-  ▓▓     ▓▓  ▓█    ▓▓  ▀▓   █▓ ▓▓   ▓▓▓▓▒▓     █▓▓    ▓▓▓▓▒▓ ▀▓▓▓▓▓▀  ▓▓▓▓▒▓  
-  ▒▓▓   ▓▓▓  ▓▓    ▓▓  ▓▓   ▓▓ ▓▓  ▓▓   ▒▓     ▓▓▒   ▓▓   ▒▓ ▓▒      ▓▓   ▒▓  
-  ▒ ▒ ▒ ▒▒   ▒▒ ▓▒ ▒▓▒ ▒ ▒▓▒   ▒▒▒ ▒▓▒ ▒ ▓▒    ▓▓    ▒▓▒ ▒ ▓▒ ▒ ▒▓▒ ▒▒▓▒ ▒ ▓▒ 
-                                             ▒▒▓             ▒▒     ▒▒        
-                                           ▒▒▒               ▒▒▒▒ ▒▒          
+ export const ASCII_BANNER = `                                  ██▄ █ █ ▄▀▀ ▀█▀ ▄▀▄ ▀▄▀ ▄▀▄ ▄▀  ▄▀▄   ▄▀▄ █▄ █ █   █ █▄ █ ██▀
+                                  █▄█ ▀▄█ ▄██  █  █▀█  █  █▀█ ▀▄█ █▀█ ▄ ▀▄▀ █ ▀█ █▄▄ █ █ ▀█ █▄▄
 `;
 
 export const BOOT_LINES = [
@@ -84,6 +73,7 @@ export const DEDSEC_OPS = [
   ['PIVOT', 'Lateral hop across city subnet', 'OP0001'],
   ['PROFILE', 'Pedestrian metadata indexed', 'OP0002'],
   ['TRACE', 'Device fingerprint logged', 'OP0002'],
+  ['WARNING!', 'Reversing DEDSEC attack', 'OP0001'],
   ['FEED', 'Public camera stream intercepted', 'OP0002'],
   ['JAM', 'Local RF band disrupted', 'OP0003'],
   ['SPOOF', 'Beacon signal cloned', 'OP0003'],
@@ -96,6 +86,7 @@ export const DEDSEC_OPS = [
   ['WIPE', 'Local trace log purged', 'OP0006'],
   ['DUMP', 'Encrypted archive exfiltrated', 'OP0007'],
   ['PUBLISH', 'Dataset released to collective', 'OP0007'],
+  ['WARNING', 'PWNED BY DEDSEC', '0x000F'],
 ];
 
 export const ATTACK_TECHNIQUES = [

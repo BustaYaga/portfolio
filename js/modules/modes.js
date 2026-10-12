@@ -11,6 +11,7 @@ export class ModeManager {
     this.threatFeed = options.threatFeed || null;
     this.dedsecFeed = options.dedsecFeed || null;
     this.terminal = options.terminal || null;
+    this.sysMonitor = options.sysMonitor || null;
     this.toggleBtn = null;
     this.viewportEl = null;
     this.recruiterMode = 0; // 0 = standard terminal mode, 1 = recruiter mode
@@ -104,12 +105,11 @@ export class ModeManager {
     });
 
     if (isRecruiterActive) {
-      if (this.threatFeed) {
-        this.threatFeed.stop();
-      }
-      if (this.dedsecFeed) {
-        this.dedsecFeed.stop();
-      }
+
+      if (this.threatFeed) this.threatFeed.stop();
+      if (this.dedsecFeed) this.dedsecFeed.stop();
+      if (this.sysMonitor) this.sysMonitor.stop();
+      
       this.showAllPanels();
 
       if (!options.isInitial) {
@@ -122,12 +122,10 @@ export class ModeManager {
       }
     } else {
       this.showPanel('dashboard');
-      if (this.threatFeed) {
-        this.threatFeed.start();
-      }
-      if (this.dedsecFeed) {
-        this.dedsecFeed.start();
-      }
+      
+      if (this.threatFeed) this.threatFeed.start();
+      if (this.dedsecFeed) this.dedsecFeed.start();
+      if (this.sysMonitor) this.sysMonitor.start();
 
       if (!options.isInitial) {
         const topEl = document.getElementById('top');
