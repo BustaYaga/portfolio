@@ -43,7 +43,6 @@ export class Terminal {
     this.registerCommand('help', () => ({
       print: [
         '<span class="font-binary">[01]</span> <strong>whoami</strong>      : quick intro & identity',
-        '<span class="font-binary">[02]</span> <strong>about</strong>       : bio, education & goals',
         '<span class="font-binary">[03]</span> <strong>skills</strong>      : offensive/defensive stack & tools',
         '<span class="font-binary">[04]</span> <strong>projects</strong>    : open lab & engineering projects',
         '<span class="font-binary">[05]</span> <strong>writeups</strong>    : HTB writeups directory',
@@ -356,6 +355,12 @@ export class Terminal {
       }, 160);
     });
 
+    // Phase 3: ASCII Cyber Banner
+    addStep(() => {
+      this.printLine(`<pre class="ascii-banner">${ASCII_BANNER}</pre>`);
+      this.printLine('<span class="font-binary-green">[SYSTEM ONLINE]</span> <span class="font-binary">SHELL INITIALIZED // ACCESSIBILITY: WCAG 2.1 AA</span>', 'diag-line');
+    }, 450);
+
     // Phase 2: Binary Cipher Scramble / Decryption
     addStep(() => {
       const p = this.printLine('<span class="bin-tag">[DECRYPT]</span> <span class="bin-stream">01000001 01101110 01101101 01101111 01101100</span>', 'diag-line');
@@ -363,12 +368,6 @@ export class Terminal {
         this.scrambleDecode('&gt;&gt; IDENTITY VERIFIED: ANMOL CHAUDHARY', p, 700);
       }
     }, 850);
-
-    // Phase 3: ASCII Cyber Banner
-    addStep(() => {
-      this.printLine(`<pre class="ascii-banner">${ASCII_BANNER}</pre>`);
-      this.printLine('<span class="font-binary-green">[SYSTEM ONLINE]</span> <span class="font-binary">SHELL INITIALIZED // ACCESSIBILITY: WCAG 2.1 AA</span>', 'diag-line');
-    }, 450);
 
     // Phase 4: Typewriter prompt for whoami & response
     addStep(() => {

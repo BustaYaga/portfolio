@@ -18,7 +18,7 @@
   <div class="nav-inner">
     <a href="#top" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
     <nav class="nav-links" id="navLinks">
-      <a href="#" data-cmd="whoami">about</a>
+      <a href="#" data-cmd="home">home</a>
       <a href="#" data-cmd="projects">projects</a>
       <a href="#" data-cmd="writeups">writeups</a>
       <a href="#" data-cmd="resume">resume</a>
@@ -96,21 +96,31 @@
 
 <!-- ============ VIEWPORT ============ -->
 <section class="section viewport" id="viewport">
-
   <div class="panel" id="panel-dashboard">
-    <h2 class="section-head"><span class="prompt-inline">$</span> neofetch</h2>
-    <div class="fetch">
-      <div class="fetch-glyph" aria-hidden="true">&gt;_</div>
-      <dl class="fetch-info">
-        <div><dt>user</dt><dd>anmol@portfolio</dd></div>
-        <div><dt>role</dt><dd>security enthusiast / developer</dd></div>
-        <div><dt>focus</dt><dd>AD exploitation, CVE research & cloud detection</dd></div>
-        <div><dt>projects</dt><dd id="statProjects">4</dd></div>
-        <div><dt>writeups</dt><dd id="statWriteups">6</dd></div>
-        <div><dt>status</dt><dd class="fetch-status">open to opportunities</dd></div>
-      </dl>
+    <h2 class="section-head"><span class="prompt-inline">$</span> btop</h2>
+    <div class="dashboard-widgets">
+
+  <div class="widget-card" id="sysMonitorCard">
+    <div class="widget-card-bar">
+      <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+      <span class="widget-card-title">sysmonitor.sh — live</span>
+      <span class="widget-card-uptime">uptime <span id="sysUptime">00:00:00</span></span>
     </div>
-    <p class="section-sub" data-content="dashboard.sub" style="margin-top:24px;"></p>
+    <div class="widget-card-body" id="sysMonitor"></div>
+  </div>
+
+  <div class="widget-card" id="ghActivityCard">
+    <div class="widget-card-bar">
+      <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+      <span class="widget-card-title">git log --oneline -5</span>
+    </div>
+    
+    <div class="widget-card-body">
+      <p class="gh-activity-status" id="ghActivityStatus">fetching recent commits…</p>
+      <div class="gh-activity-list" id="ghActivityList"></div>
+    </div>
+  </div>
+</div>
   </div>
 
   <!-- Plain summary aimed at recruiters and hiring managers -->

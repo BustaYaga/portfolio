@@ -9,8 +9,10 @@ import { ModeManager } from './modules/modes.js';
 import { Navigation } from './modules/navigation.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
+import { SysMonitor } from './modules/sysmonitor.js';
+import { GithubActivity } from './modules/github-activity.js';
 
-export { ThreatFeed, DedsecFeed, Terminal, ModeManager, Navigation, Config, PORTFOLIO_CONTENT as Content, applyContent };
+export { ThreatFeed, DedsecFeed, Terminal, ModeManager, Navigation, SysMonitor, GithubActivity, Config, PORTFOLIO_CONTENT as Content, applyContent };
 
 export class PortfolioApp {
   constructor() {
@@ -18,10 +20,13 @@ export class PortfolioApp {
     this.dedsecFeed = new DedsecFeed();
     this.terminal = new Terminal();
     this.certs = new CertsPanel({ certifications: CERTIFICATIONS });
+    this.sysMonitor = new SysMonitor();
+    this.githubActivity = new GithubActivity();
     this.modes = new ModeManager({
       threatFeed: this.threatFeed,
       dedsecFeed: this.dedsecFeed,
       terminal: this.terminal,
+      sysMonitor: this.sysMonitor,
     });
     this.navigation = new Navigation({ modeManager: this.modes, terminal: this.terminal });
   }
@@ -30,7 +35,10 @@ export class PortfolioApp {
     applyContent();
     this.threatFeed.init();
     this.dedsecFeed.init();
-    this.certs.init(); // render cert rows before any command can reference them
+    this.sysMonitor.init();
+    this.sysMonitor.start();
+    this.githubActivity.init();
+    this.certs.init();
 
     this.terminal.onPanelRequested = (panel) => this.modes.showPanel(panel);
     this.terminal.onRecruiterRequested = () => this.modes.toggleRecruiterMode();

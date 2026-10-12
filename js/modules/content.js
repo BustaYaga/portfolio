@@ -2,7 +2,7 @@
 export const PORTFOLIO_CONTENT = {
   // Hero section hint
   hero: {
-    hint: 'type <code>help</code> to inspect available commands, or explore sections below',
+    hint: 'type <code>help</code> to inspect available commands.',
   },
 
   dashboard: {
