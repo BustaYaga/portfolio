@@ -3,6 +3,11 @@
  * Global tokens, MITRE ATT&CK datasets, and default settings.
  */
 
+export const WRITEUP_STATUS = {
+  layover: 'locked',
+  kobold: 'missing',
+};
+
 export const STORAGE_KEY = 'portfolio-recruiter-mode';
 export const MAX_FEED_LINES = 6;
 

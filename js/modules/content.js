@@ -1,8 +1,3 @@
-/**
- * Content Module
- * Encapsulates all paragraph copy and text data for the portfolio.
- * Populated from Anmol Chaudhary's resume and HackTheBox writeups.
- */
 
 export const PORTFOLIO_CONTENT = {
   // Hero section hint
@@ -10,26 +5,20 @@ export const PORTFOLIO_CONTENT = {
     hint: 'type <code>help</code> to inspect available commands, or explore sections below',
   },
 
-  // Terminal dashboard (neofetch) subtitle
   dashboard: {
     sub: 'Try typing <code>projects</code>, <code>writeups</code>, <code>skills</code>, <code>resume</code>, or <code>recruiter</code> in the shell above.',
   },
 
-  // Recruiter panel summary
   recruiter: {
     summary:
       "<p>I'm <strong>Anmol Chaudhary</strong>, a Computer Applications graduate specializing in <strong>Cybersecurity (Offensive Security / SOC Analysis)</strong> and <strong>Software Development</strong> based in <strong>Dehradun, India</strong>.<br>I have practical, hands-on experience through various labs covering web exploitation, Active Directory penetration testing (Kerberos, BloodHound), network forensics (Wireshark PCAP analysis), CVE research, and cloud threat detection with Microsoft Sentinel (KQL).<br>I'm seeking an entry-level role where I can contribute to securing critical infrastructure or developing reliable systems.</p>",
   },
 
-  // About me paragraphs
-  
   skills: {
     skill:
-      // "Currently mastering Active Directory privilege escalation chains, cloud detection engineering using Microsoft Sentinel with KQL, and modern web application security. Looking for an entry-level role in Cybersecurity (SOC Analyst, Junior Penetration Tester, Security Engineer) or Software Engineering.",
       '<p>Constantly evolving, forever learning, always building.<br><span class="font-binary-accent">[OFFENSIVE SECURITY]</span> Burp Suite, Metasploit, BloodHound, NetExec, Gobuster, Hydra, Hashcat, LinPEAS, Python Exploit Scripting<br><span class="font-binary-green">[DEFENSIVE / SOC & SIEM]</span> Microsoft Sentinel, KQL (Kusto Query Language), SIEM Log Triage, MITRE ATT&CK, IOC Hunting<br><span class="font-binary">[NETWORKING & FORENSICS]</span> Wireshark PCAP & TCP Stream Analysis, TCP/IP, DNS, DHCP, VLANs, Subnetting, OSI Model<br><span class="font-binary-accent">[SYSTEMS & DEVELOPMENT]</span> Python, Bash, SQL, Linux (Kali/Ubuntu), Windows Server, Active Directory, Docker, Git, Azure</p>',
     },
 
-  // Project descriptions
   projects: {
     project1:
       'Exploited IDOR, SSTI, and Next.js unauthenticated RCE (CVE-2025-55182) across 7 HTB targets. Escalated to root via Node.js V8 debug port hijacking, cron job write access, and pickle deserialization.',
@@ -41,17 +30,14 @@ export const PORTFOLIO_CONTENT = {
       'Audited multi-tier web applications for backend logic flaws and access-control vulnerabilities. Traced API workflows with Burp Suite, patched template injections, and debugged multi-container Docker deployments.',
   },
 
-  // Writeups directory subtitle
   writeups: {
     sub: 'Detailed writeups of solved machines and labs covering various vulnerabilities and exploitation techniques. Click a row to read.',
   },
 
-  // Resume section instruction
   resume: {
     note: 'Download verified resumes tailored for Network Security & Cybersecurity or Software Development.',
   },
 
-  // Footer tagline and copyright
   footer: {
     tagline:
       '&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.',
