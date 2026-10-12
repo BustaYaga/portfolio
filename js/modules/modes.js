@@ -9,6 +9,7 @@ import { STORAGE_KEY } from './config.js';
 export class ModeManager {
   constructor(options = {}) {
     this.threatFeed = options.threatFeed || null;
+    this.dedsecFeed = options.dedsecFeed || null;
     this.terminal = options.terminal || null;
     this.toggleBtn = null;
     this.viewportEl = null;
@@ -106,6 +107,9 @@ export class ModeManager {
       if (this.threatFeed) {
         this.threatFeed.stop();
       }
+      if (this.dedsecFeed) {
+        this.dedsecFeed.stop();
+      }
       this.showAllPanels();
 
       if (!options.isInitial) {
@@ -120,6 +124,9 @@ export class ModeManager {
       this.showPanel('dashboard');
       if (this.threatFeed) {
         this.threatFeed.start();
+      }
+      if (this.dedsecFeed) {
+        this.dedsecFeed.start();
       }
 
       if (!options.isInitial) {

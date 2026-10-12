@@ -38,45 +38,61 @@
 <!-- ============ HERO / INTERACTIVE SHELL ============ -->
 <section class="hero" id="top">
   <div class="hero-inner">
-    <div class="terminal" id="terminal">
-      <div class="terminal-bar">
-        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-        <span class="terminal-title">bash — anmol@portfolio</span>
-        <button class="term-skip-btn" id="termSkipBtn" type="button" title="Skip boot sequence">[ESC / skip]</button>
+    <div class="terminal-stack">
+
+      <!-- ============ AMBIENT DEDSEC-STYLE FEED (peeks from behind, center-left) ============ -->
+      <aside class="ambient-term dedsec-feed" id="dedsec-feed" aria-label="Collective Operations Feed">
+        <div class="ambient-term-bar dedsec-feed-bar">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="ambient-term-title dedsec-feed-title">collective.log</span>
+        </div>
+        <div class="ambient-term-body dedsec-feed-body" id="dedsec-feed-body" role="log" aria-live="polite">
+          <p><span class="font-binary">[0x0001]</span><span class="feed-id">[UPLINK]</span> Grid node handshake established :: Network Intrusion</p>
+          <p><span class="font-binary">[0x0002]</span><span class="feed-id">[PROFILE]</span> Pedestrian metadata indexed :: Surveillance</p>
+        </div>
+      </aside>
+
+      <div class="terminal" id="terminal">
+        <div class="terminal-bar">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="terminal-title">bash — anmol@portfolio</span>
+          <button class="term-skip-btn" id="termSkipBtn" type="button" title="Skip boot sequence">[ESC / skip]</button>
+        </div>
+        <div class="terminal-body" id="termOutput" aria-live="polite">
+          <noscript>
+            <p class="out">JavaScript is off, so the shell won't run — scroll down, everything is also listed as plain sections.</p>
+          </noscript>
+        </div>
+        <div class="terminal-input-row">
+          <span class="prompt">anmol@portfolio:~$</span>
+          <input
+            type="text"
+            id="termInput"
+            class="terminal-input"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="terminal command input"
+          >
+        </div>
       </div>
-      <div class="terminal-body" id="termOutput" aria-live="polite">
-        <noscript>
-          <p class="out">JavaScript is off, so the shell won't run — scroll down, everything is also listed as plain sections.</p>
-        </noscript>
-      </div>
-      <div class="terminal-input-row">
-        <span class="prompt">anmol@portfolio:~$</span>
-        <input
-          type="text"
-          id="termInput"
-          class="terminal-input"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-          aria-label="terminal command input"
-        >
-      </div>
+
+      <!-- ============ AMBIENT MITRE ATT&CK FEED (peeks from behind, bottom-right) ============ -->
+      <aside class="ambient-term threat-feed" id="threat-feed" aria-label="MITRE ATT&CK Threat Feed">
+        <div class="ambient-term-bar threat-feed-bar">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="ambient-term-title threat-feed-title">threat-feed.log</span>
+        </div>
+        <div class="ambient-term-body threat-feed-body" id="threat-feed-body" role="log" aria-live="polite">
+          <p data-content="threatFeed.seed1"><span class="bin-tag">[01000010]</span><span class="feed-id">[T1059]</span> Command and Scripting Interpreter :: Execution</p>
+          <p data-content="threatFeed.seed2"><span class="bin-tag">[01001111]</span><span class="feed-id">[T1190]</span> Exploit Public-Facing Application :: Initial Access</p>
+        </div>
+      </aside>
+
     </div>
     <p class="hero-hint" data-content="hero.hint"></p>
   </div>
 </section>
-
-<!-- ============ AMBIENT MITRE ATT&CK FEED ============ -->
-<aside class="ambient-term threat-feed" id="threat-feed" aria-label="MITRE ATT&CK Threat Feed">
-  <div class="ambient-term-bar threat-feed-bar">
-    <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-    <span class="ambient-term-title threat-feed-title">threat-feed.log</span>
-  </div>
-  <div class="ambient-term-body threat-feed-body" id="threat-feed-body" role="log" aria-live="polite">
-    <p data-content="threatFeed.seed1"><span class="bin-tag">[01000010]</span><span class="feed-id">[T1059]</span> Command and Scripting Interpreter :: Execution</p>
-    <p data-content="threatFeed.seed2"><span class="bin-tag">[01001111]</span><span class="feed-id">[T1190]</span> Exploit Public-Facing Application :: Initial Access</p>
-  </div>
-</aside>
 
 <!-- ============ VIEWPORT ============ -->
 <section class="section viewport" id="viewport">

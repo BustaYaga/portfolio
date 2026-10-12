@@ -206,16 +206,22 @@ body[data-terminal="off"] .nav-recruiter {
 }
 .hero-inner { display: flex; flex-direction: column; gap: 28px; }
 
+.terminal-stack {
+  position: relative;
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
 .terminal {
   position: relative;
+  z-index: 2;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 0 0 1px rgba(255, 106, 26, 0.08), 0 20px 60px -30px rgba(0,0,0,0.6);
   width: 100%;
-  max-width: 1060px;
-  margin: 0 auto;
 }
 .terminal-bar {
   display: flex;
@@ -725,24 +731,40 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
 .contact-link:hover span { color: var(--accent); }
 
 /* ===========================================================
-   AMBIENT MITRE ATT&CK FEED (decorative, fixed-position)
+   AMBIENT FEEDS (decorative) — tucked behind the main terminal,
+   each peeking out from a different edge so they read as stacked
+   "windows" sitting beneath the active shell, not floating HUD chrome.
    =========================================================== */
-.ambient-term,
-.threat-feed {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  width: 260px;
+.ambient-term {
+  position: absolute;
+  z-index: 1;
+  width: 240px;
   background: rgba(21, 19, 16, 0.92);
   backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  z-index: 30;
   box-shadow: 0 16px 40px -20px rgba(0,0,0,0.7);
+  transition: transform 0.25s ease;
 }
-.ambient-term-bar,
-.threat-feed-bar {
+
+/* threat-feed: peeks out from behind the terminal's bottom-right corner */
+.threat-feed {
+  right: -150px;
+  bottom: -20px;
+  transform: rotate(2.5deg);
+}
+.terminal-stack:hover .threat-feed { transform: rotate(2.5deg) translateY(50px); }
+
+/* dedsec-feed: peeks out from behind the terminal's center-left edge */
+.dedsec-feed {
+  left: -100px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-2.5deg);
+}
+.terminal-stack:hover .dedsec-feed { transform: translateY(-50%) rotate(-2.5deg) translateX(-50px); }
+
+.ambient-term-bar {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -750,18 +772,15 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
   background: var(--surface-2);
   border-bottom: 1px solid var(--border);
 }
-.ambient-term-bar .dot,
-.threat-feed-bar .dot { width: 7px; height: 7px; }
-.ambient-term-title,
-.threat-feed-title {
+.ambient-term-bar .dot { width: 7px; height: 7px; }
+.ambient-term-title {
   margin-left: 4px;
   font-family: var(--mono);
   font-size: 0.66rem;
   color: var(--text-dim);
 }
-.ambient-term-body,
-.threat-feed-body {
-  height: 150px;
+.ambient-term-body {
+  height: 130px;
   overflow: hidden;
   padding: 10px 12px;
   display: flex;
@@ -769,8 +788,7 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
   justify-content: flex-end;
   gap: 5px;
 }
-.ambient-term-body p,
-.threat-feed-body p {
+.ambient-term-body p {
   margin: 0;
   font-family: var(--mono);
   font-size: 0.68rem;
@@ -781,8 +799,9 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
   text-overflow: ellipsis;
   animation: feedIn 0.4s ease both;
 }
-.ambient-term-body .feed-id,
-.threat-feed-body .feed-id { color: var(--accent); }
+.ambient-term-body .feed-id { color: var(--accent); }
+/* dedsec-feed gets a cyan tint so the two stacked logs read as distinct sources */
+.dedsec-feed-body .feed-id { color: var(--cyber-cyan); }
 
 @keyframes feedIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -790,12 +809,10 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
 }
 
 body[data-terminal="off"] .ambient-term,
-body[data-terminal="off"] .threat-feed,
 body[data-terminal="off"] .hero { display: none; }
 
-@media (max-width: 768px) {
-  .ambient-term,
-  .threat-feed { display: none; }
+@media (max-width: 900px) {
+  .ambient-term { display: none; }
 }
 
 /* ===========================================================

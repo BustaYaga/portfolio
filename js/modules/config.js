@@ -65,6 +65,39 @@ export const ATTACK_TACTICS = {
   TA0040: 'Impact',
 };
 
+export const DEDSEC_OPS_CATEGORIES = {
+  OP0001: 'Network Intrusion',
+  OP0002: 'Surveillance',
+  OP0003: 'Signal Disruption',
+  OP0004: 'Infrastructure',
+  OP0005: 'Social Engineering',
+  OP0006: 'Counter-Surveillance',
+  OP0007: 'Data Liberation',
+};
+
+// Decorative, original flavor lines evoking a hacktivist-collective /
+// smart-city-hacking aesthetic for the ambient secondary feed. Not sourced
+// from or quoting any third-party game, book, or script — written fresh.
+export const DEDSEC_OPS = [
+  ['UPLINK', 'Grid node handshake established', 'OP0001'],
+  ['BREACH', 'Perimeter firewall bypassed', 'OP0001'],
+  ['PIVOT', 'Lateral hop across city subnet', 'OP0001'],
+  ['PROFILE', 'Pedestrian metadata indexed', 'OP0002'],
+  ['TRACE', 'Device fingerprint logged', 'OP0002'],
+  ['FEED', 'Public camera stream intercepted', 'OP0002'],
+  ['JAM', 'Local RF band disrupted', 'OP0003'],
+  ['SPOOF', 'Beacon signal cloned', 'OP0003'],
+  ['BLACKOUT', 'Sector relay forced offline', 'OP0003'],
+  ['CTRL', 'Traffic controller node seized', 'OP0004'],
+  ['OVERRIDE', 'Transit grid signal overridden', 'OP0004'],
+  ['LEAK', 'Internal comms channel tapped', 'OP0005'],
+  ['PHISH', 'Credential lure deployed', 'OP0005'],
+  ['MASK', 'Operator identity obfuscated', 'OP0006'],
+  ['WIPE', 'Local trace log purged', 'OP0006'],
+  ['DUMP', 'Encrypted archive exfiltrated', 'OP0007'],
+  ['PUBLISH', 'Dataset released to collective', 'OP0007'],
+];
+
 export const ATTACK_TECHNIQUES = [
   ['T1566', 'Phishing', 'TA0001'],
   ['T1190', 'Exploit Public-Facing Application', 'TA0001'],
