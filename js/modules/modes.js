@@ -29,13 +29,11 @@ export class ModeManager {
       });
     }
 
-    // Also support any nav elements with data-cmd="recruiter"
-    document.querySelectorAll('[data-cmd="recruiter"]').forEach((el) => {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.toggleRecruiterMode();
-      });
-    });
+    // NOTE: data-cmd="recruiter" nav links (e.g. the #navLinks text link) are
+    // wired up by Navigation.setupNavLinks(), which calls
+    // modeManager.toggleRecruiterMode(). Do NOT also attach a listener here —
+    // doing so double-fires the toggle on every click (on then immediately
+    // off again), which made that link appear to do nothing.
   }
 
   getStoredMode() {

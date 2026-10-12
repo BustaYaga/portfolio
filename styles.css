@@ -587,6 +587,96 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
 .wt-name { font-family: var(--mono); color: #f6efe2; }
 .wt-date { color: var(--text-dim); font-family: var(--mono); font-size: 0.82rem; }
 
+.wu-notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 20px 0 28px;
+  padding: 16px 18px;
+  background: rgba(224, 184, 78, 0.08);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--radius);
+}
+.wu-notice-icon { color: var(--warn); font-size: 1.1rem; line-height: 1.4; }
+.wu-notice strong {
+  display: block;
+  color: var(--warn);
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+}
+.wu-notice p { margin: 0; color: var(--text-dim); font-size: 0.88rem; max-width: 62ch; }
+
+
+/* ===========================================================
+   WRITEUP STATUS (locked / missing) — js/modules/writeup.js
+   =========================================================== */
+.wu-blurred {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.wu-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.wu-lock-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 11, 9, 0.75);
+  backdrop-filter: blur(2px);
+}
+.wu-lock-dialog {
+  position: relative;
+  width: min(460px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+}
+.wu-lock-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.wu-lock-bar-title {
+  margin-left: 8px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+.wu-lock-body { padding: 32px 28px 28px; text-align: center; }
+.wu-lock-icon { font-size: 1.8rem; display: block; margin-bottom: 10px; }
+.wu-lock-body h3 { font-size: 1.1rem; color: var(--warn); margin-bottom: 12px; }
+.wu-lock-body p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin: 0 0 22px; }
+.wu-lock-back { display: inline-flex; }
+
+/* "missing writeup" inline notice (non-blurred pages) */
+.wu-notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 20px 0 28px;
+  padding: 16px 18px;
+  background: rgba(224, 184, 78, 0.08);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--radius);
+}
+.wu-notice-icon { color: var(--warn); font-size: 1.1rem; line-height: 1.4; }
+.wu-notice strong { display: block; color: var(--warn); font-family: var(--mono); font-size: 0.88rem; margin-bottom: 4px; }
+.wu-notice p { margin: 0; color: var(--text-dim); font-size: 0.88rem; max-width: 62ch; }
 .os-tag, .diff-tag {
   font-family: var(--mono);
   font-size: 0.72rem;
