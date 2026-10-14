@@ -9,6 +9,7 @@ import { ModeManager } from './modules/modes.js';
 import { Navigation } from './modules/navigation.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
+import { CHOICE_KEY } from './modules/config.js';
 import { SysMonitor } from './modules/sysmonitor.js';
 import { GithubActivity } from './modules/github-activity.js';
 
@@ -55,9 +56,65 @@ export class PortfolioApp {
     this.modes.init();
     this.navigation.init();
 
-    if (this.modes.currentMode === 'on') {
-      this.terminal.typeBoot();
+    this.setupIntroGate();
+  }
+
+  // First-time visitors pick a view (recruiter vs technical) at the intro gate.
+  // Returning visitors skip it (the gate is hidden before first paint by the
+  // inline head script) and resume their stored mode.
+  setupIntroGate() {
+    const gate = document.getElementById('intro-gate');
+
+    let hasChosen = false;
+    try {
+      hasChosen = !!localStorage.getItem(CHOICE_KEY);
+    } catch {
+      hasChosen = false;
     }
+
+    // Boot the shell only when the terminal view is already the active one.
+    const bootIfTerminal = () => {
+      if (this.modes.currentMode === 'on') this.terminal.typeBoot();
+    };
+
+    // No gate in the DOM, or the visitor already chose: behave as before.
+    if (!gate || hasChosen) {
+      if (gate) gate.remove();
+      bootIfTerminal();
+      return;
+    }
+
+    // First visit: hold the engineer experience (no boot, no live feeds)
+    // behind the gate until a choice is made.
+    this.threatFeed.stop();
+    this.dedsecFeed.stop();
+    this.sysMonitor.stop();
+
+    const choose = (choice) => {
+      try {
+        localStorage.setItem(CHOICE_KEY, choice);
+      } catch {
+        /* storage may be restricted */
+      }
+      gate.classList.add('intro-gate--dismissed');
+      setTimeout(() => gate.remove(), 450);
+
+      if (choice === 'recruiter') {
+        this.modes.setRecruiterMode(1);
+      } else {
+        this.modes.setRecruiterMode(0);
+        this.terminal.typeBoot();
+        this.terminal.focus();
+      }
+    };
+
+    gate.querySelectorAll('[data-gate-choice]').forEach((btn) => {
+      btn.addEventListener('click', () => choose(btn.dataset.gateChoice));
+    });
+
+    // Keyboard/accessibility: focus the first choice.
+    const first = gate.querySelector('[data-gate-choice]');
+    if (first) first.focus();
   }
 }
 

@@ -10,8 +10,46 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script>
+  // Hide the intro gate before first paint for returning visitors who already
+  // chose a view, so there is no flash of the choice screen.
+  try {
+    if (localStorage.getItem('portfolio-visitor-choice')) {
+      document.documentElement.setAttribute('data-gate', 'hidden');
+    }
+  } catch (e) {}
+</script>
 </head>
 <body>
+
+<!-- ============ INTRO GATE (first-visit view chooser) ============ -->
+<div class="intro-gate" id="intro-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <noscript><style>#intro-gate{display:none !important;}</style></noscript>
+  <div class="intro-gate-inner">
+    <span class="intro-gate-brand">anmol@portfolio<span class="nav-sep">:~$</span></span>
+    <h1 class="intro-gate-name" id="gate-title">Anmol Chaudhary</h1>
+    <p class="intro-gate-role">Cybersecurity Analyst &amp; Developer — seeking entry-level roles</p>
+    <p class="intro-gate-prompt">How would you like to view this portfolio?</p>
+
+    <div class="intro-gate-choices">
+      <button type="button" class="intro-card" data-gate-choice="recruiter">
+        <span class="intro-card-icon" aria-hidden="true">👔</span>
+        <span class="intro-card-title">Recruiter / Non-technical</span>
+        <span class="intro-card-desc">A clean, readable overview — summary, skills, experience and resume.</span>
+        <span class="intro-card-cta">View portfolio →</span>
+      </button>
+
+      <button type="button" class="intro-card intro-card-tech" data-gate-choice="technical">
+        <span class="intro-card-icon" aria-hidden="true">&gt;_</span>
+        <span class="intro-card-title">Developer / Technical</span>
+        <span class="intro-card-desc">Interactive terminal, live dashboards and Hack The Box writeups.</span>
+        <span class="intro-card-cta">Launch terminal →</span>
+      </button>
+    </div>
+
+    <p class="intro-gate-note">You can switch views anytime from the toggle in the top-right.</p>
+  </div>
+</div>
 
 <!-- ============ NAV ============ -->
 <header class="nav" id="nav">

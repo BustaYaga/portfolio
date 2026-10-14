@@ -1137,3 +1137,106 @@ body[data-terminal="off"] .panel { animation: none; }
 .cert-viewer-close { background: none; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim); width: 26px; height: 26px; cursor: pointer; line-height: 1; }
 .cert-viewer-close:hover { color: var(--accent); border-color: var(--accent); }
 .cert-viewer-frame { flex: 1; border: none; background: #fff; }
+
+/* ===========================================================
+   INTRO GATE — first-visit view chooser
+   =========================================================== */
+.intro-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(255, 106, 26, 0.08), transparent 60%),
+    var(--bg, #0e0c0a);
+  overflow-y: auto;
+  animation: gate-fade-in 0.35s ease;
+}
+/* returning visitors (set before first paint) never see it */
+html[data-gate="hidden"] .intro-gate { display: none !important; }
+/* after a choice, fade out */
+.intro-gate.intro-gate--dismissed { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+
+@keyframes gate-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.intro-gate-inner { width: 100%; max-width: 760px; text-align: center; }
+.intro-gate-brand {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+.intro-gate-brand .nav-sep { color: var(--accent); }
+.intro-gate-name {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  margin: 14px 0 6px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.intro-gate-role { color: var(--text-dim); font-size: 0.95rem; margin: 0 0 32px; }
+.intro-gate-prompt {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin: 0 0 20px;
+}
+.intro-gate-prompt::before { content: "$ "; color: var(--text-dim); }
+
+.intro-gate-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  text-align: left;
+}
+.intro-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 26px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+.intro-card:hover,
+.intro-card:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  background: var(--surface-2);
+  outline: none;
+}
+.intro-card-icon {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.intro-card-tech .intro-card-icon { color: var(--accent); }
+.intro-card-title { font-size: 1.05rem; font-weight: 600; color: var(--text); }
+.intro-card-desc { color: var(--text-dim); font-size: 0.88rem; line-height: 1.55; flex-grow: 1; }
+.intro-card-cta {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-top: 6px;
+}
+.intro-gate-note {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin: 28px 0 0;
+}
+
+@media (max-width: 600px) {
+  .intro-gate-choices { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-gate, .intro-card { animation: none; transition: none; }
+  .intro-card:hover, .intro-card:focus-visible { transform: none; }
+}

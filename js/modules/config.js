@@ -14,6 +14,8 @@ export const WRITEUP_STATUS = {
 };
 
 export const STORAGE_KEY = 'portfolio-recruiter-mode';
+// Tracks whether a first-time visitor has picked a view at the intro gate.
+export const CHOICE_KEY = 'portfolio-visitor-choice';
 export const MAX_FEED_LINES = 6;
 
 export const prefersReducedMotion = () =>
