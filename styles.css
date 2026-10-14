@@ -356,6 +356,15 @@ body[data-terminal="off"] .nav-recruiter {
   margin-left: 2px;
 }
 
+/* highlighted keyword in terminal output (e.g. `help`) */
+.term-hl {
+  color: var(--accent);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  padding: 0 5px;
+  border-radius: 3px;
+}
+
 .terminal-input-row {
   display: flex;
   align-items: center;
@@ -1435,6 +1444,8 @@ body[data-terminal="off"] #panel-skills { display: none !important; }
    CS MODE (hidden `sudo cs` easter egg)
    =========================================================== */
 .cs-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+/* hide the OS cursor while the crosshair is drawn */
+body.cs-nocursor, body.cs-nocursor * { cursor: none !important; }
 /* keep real content above the canvas */
 body.cs-mode .nav,
 body.cs-mode .hero,

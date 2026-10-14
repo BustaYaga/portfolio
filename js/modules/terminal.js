@@ -15,6 +15,10 @@ import {
   SUDO_HELP_LINES,
 } from './config.js';
 
+// Final resting line after boot — `help` is highlighted.
+const HELP_HINT =
+  'Use <span class="term-hl">help</span> for list of commands. Type recruiter to enter recruiter mode';
+
 export class Terminal {
   constructor(options = {}) {
     this.terminalEl = null;
@@ -147,7 +151,12 @@ export class Terminal {
     if (sub === 'cs') {
       if (!this.superuser) return deny();
       if (this.onCsRequested) this.onCsRequested();
-      return { print: ['<span class="font-binary">[cs]</span> loading cs2.exe ...'] };
+      return {
+        print: [
+          '<span class="font-binary">[cs]</span> loading cs2.exe ...',
+          '<span class="font-binary">[cs]</span> to exit: press <span class="term-hl">ESC</span>, click <span class="term-hl">[ exit cs2 ]</span>, or run <span class="term-hl">sudo cs</span> again',
+        ],
+      };
     }
     if (sub) {
       return this.superuser
@@ -352,11 +361,9 @@ export class Terminal {
       this.skipBtn.style.display = 'none';
     }
 
+    // Resting state: a cleared terminal showing only the help hint.
     this.clear();
-    this.printLine(`<pre class="ascii-banner">${ASCII_BANNER}</pre>`);
-    this.printLine('<span class="font-binary-green">[SEC_CORE_READY]</span> <span class="font-binary">OPERATOR: ANMOL CHAUDHARY</span>', 'diag-line');
-    this.printLine('anmol@portfolio:~$ whoami', 'prompt-line');
-    this.printLine("Hi, I'm Anmol Chaudhary — A Cybersecurity Researcher & Developer seeking entry-level jobs", 'diag-line');
+    this.printLine(HELP_HINT);
     this.focus();
   }
 
@@ -410,85 +417,49 @@ export class Terminal {
       }
     }, 850);
 
-    // Phase 4: Typewriter prompt for whoami & response
+    // Phase 4: silently type the identity line (no `whoami` command echo),
+    // then clear the screen and settle on only the highlighted help hint.
     addStep(() => {
-      // 1. Create Whoami Prompt Line
-      const p1 = document.createElement('p');
-      const promptSpan = document.createElement('span');
-      promptSpan.className = 'prompt';
-      promptSpan.textContent = 'anmol@portfolio:~$ ';
-      p1.appendChild(promptSpan);
+      const p2 = document.createElement('p');
+      p2.className = 'out';
 
-      const cmdSpan = document.createElement('span');
-      p1.appendChild(cmdSpan);
+      const respSpan = document.createElement('span');
+      p2.appendChild(respSpan);
 
-      const cursor1 = document.createElement('span');
-      cursor1.className = 'type-cursor';
-      p1.appendChild(cursor1);
+      const cursor2 = document.createElement('span');
+      cursor2.className = 'type-cursor';
+      p2.appendChild(cursor2);
 
-      this.outputEl.appendChild(p1);
+      this.outputEl.appendChild(p2);
 
-      const targetCmd = 'whoami';
-      let charIdx1 = 0;
+      const targetResp = "Hi, I'm Anmol Chaudhary";
+      let charIdx = 0;
 
-      // Typewriter function for 'whoami'
-      const typeCommand = () => {
+      const typeResponse = () => {
         if (!this.bootActive) return;
-        if (charIdx1 < targetCmd.length) {
-          cmdSpan.textContent += targetCmd[charIdx1++];
-          const t = setTimeout(typeCommand, speed + Math.random() * 20);
+        if (charIdx < targetResp.length) {
+          respSpan.textContent += targetResp[charIdx++];
+          const t = setTimeout(typeResponse, speed + Math.random() * 15);
           this.bootTimeouts.push(t);
         } else {
-          cursor1.remove(); // Remove cursor from prompt line
-          
-          const tPause = setTimeout(() => {
+          cursor2.remove();
+
+          const tEnd = setTimeout(() => {
             if (!this.bootActive) return;
-
-            // 2. Create Response Output Line with its own typewriter effect
-            const p2 = document.createElement('p');
-            p2.className = 'out';
-
-            const respSpan = document.createElement('span');
-            p2.appendChild(respSpan);
-
-            const cursor2 = document.createElement('span');
-            cursor2.className = 'type-cursor';
-            p2.appendChild(cursor2);
-
-            this.outputEl.appendChild(p2);
-
-            const targetResp = "Hi, I'm Anmol Chaudhary — A Cybersecurity Researcher & Developer";
-            let charIdx2 = 0;
-
-            const typeResponse = () => {
-              if (!this.bootActive) return;
-              if (charIdx2 < targetResp.length) {
-                respSpan.textContent += targetResp[charIdx2++];
-                const t2 = setTimeout(typeResponse, speed + Math.random() * 15);
-                this.bootTimeouts.push(t2);
-              } else {
-                cursor2.remove(); // Remove cursor after finished typing
-
-                // Type help instructions
-                const tHelp = setTimeout(() => {
-                  if (!this.bootActive) return;
-                  this.printLine('Use help for list of commands. Type recruiter to enter recruiter mode');
-                  this.bootActive = false;
-                  if (this.skipBtn) this.skipBtn.style.display = 'none';
-                  this.focus();
-                  if (onComplete) onComplete();
-                }, 300);
-                this.bootTimeouts.push(tHelp);
-              }
-            };
-
-            typeResponse();
-          }, 200);
-          this.bootTimeouts.push(tPause);
+            // Clear everything silently (no `clear` command echoed) so the
+            // only thing left is the help hint in an empty terminal.
+            this.clear();
+            this.printLine(HELP_HINT);
+            this.bootActive = false;
+            if (this.skipBtn) this.skipBtn.style.display = 'none';
+            this.focus();
+            if (onComplete) onComplete();
+          }, 700);
+          this.bootTimeouts.push(tEnd);
         }
       };
 
-      typeCommand();
+      typeResponse();
     }, 450);
   }
 
