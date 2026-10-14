@@ -8,6 +8,7 @@ import { Terminal } from './modules/terminal.js';
 import { ModeManager } from './modules/modes.js';
 import { Navigation } from './modules/navigation.js';
 import { Greeting } from './modules/greeting.js';
+import { NameGlitch } from './modules/glitch.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
 import { CHOICE_KEY } from './modules/config.js';
@@ -32,6 +33,7 @@ export class PortfolioApp {
     });
     this.navigation = new Navigation({ modeManager: this.modes, terminal: this.terminal });
     this.greeting = new Greeting();
+    this.nameGlitch = new NameGlitch();
   }
 
   init() {
@@ -57,9 +59,27 @@ export class PortfolioApp {
 
     this.modes.init();
     this.navigation.init();
-    this.greeting.init();
+
+    // Rotating hero greeting (Hi / Hello / Howdy / Hey / Namaste) — kept as a
+    // feature but disabled for now; the hero shows a static "Hi". Re-enable by
+    // uncommenting the line below.
+    // this.greeting.init();
+
+    this.nameGlitch.init();
+    this.watchRecruiterGlitch();
 
     this.setupIntroGate();
+  }
+
+  // Start the hero name glitch once the recruiter view is actually visible
+  // (and again is a no-op, since the glitch is idempotent and one-shot).
+  watchRecruiterGlitch() {
+    const startIfRecruiter = () => {
+      if (document.body.dataset.terminal === 'off') this.nameGlitch.start();
+    };
+    startIfRecruiter();
+    const observer = new MutationObserver(startIfRecruiter);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-terminal'] });
   }
 
   // First-time visitors pick a view (recruiter vs technical) at the intro gate.
