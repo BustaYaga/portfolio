@@ -1345,18 +1345,6 @@ body[data-terminal="off"] #panel-skills { display: none !important; }
 .rv-head { font-family: var(--mono); font-size: 1.05rem; color: var(--text); margin: 44px 0 18px; }
 .rv-head .rv-prompt { color: var(--accent); margin-right: 8px; }
 
-/* ---- KPI strip ---- */
-.rv-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-.rv-kpi {
-  border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--surface); padding: 20px 18px;
-  position: relative; overflow: hidden;
-}
-.rv-kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
-.rv-kpi-num { display: block; font-family: var(--mono); font-size: 1.9rem; font-weight: 600; color: var(--text); line-height: 1; }
-.rv-kpi-plus { color: var(--accent); }
-.rv-kpi-label { display: block; margin-top: 8px; font-size: 0.8rem; color: var(--text-dim); }
-
 /* ---- capability cards ---- */
 .rv-caps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .rv-cap {
@@ -1384,7 +1372,6 @@ body[data-terminal="off"] #panel-skills { display: none !important; }
 .rv-more { text-align: center; font-family: var(--mono); font-size: 0.82rem; color: var(--text-dim); margin: 40px 0 0; }
 
 @media (max-width: 720px) {
-  .rv-kpis { grid-template-columns: repeat(2, 1fr); }
   .rv-caps { grid-template-columns: 1fr; }
   .rv-hero { padding-top: 52px; }
 }
@@ -1442,4 +1429,69 @@ body[data-terminal="off"] #panel-skills { display: none !important; }
   .rv-name--glitch { animation: none; }
   .rv-name--glitch::before, .rv-name--glitch::after { display: none; }
   .rv-name--typing { animation: none; border-right-color: transparent; }
+}
+
+/* ===========================================================
+   CS MODE (hidden `sudo cs` easter egg)
+   =========================================================== */
+.cs-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+/* keep real content above the canvas */
+body.cs-mode .nav,
+body.cs-mode .hero,
+body.cs-mode #viewport,
+body.cs-mode .footer { position: relative; z-index: 1; }
+
+.cs-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0; transition: opacity 0.5s ease;
+  padding: 24px; text-align: center;
+}
+.cs-overlay--in { opacity: 1; }
+.cs-overlay--out { opacity: 0; }
+.cs-overlay-quote {
+  font-family: var(--mono);
+  font-size: clamp(1.3rem, 5vw, 2.8rem);
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 0 18px rgba(255, 150, 40, 0.7), 2px 0 0 rgba(90,200,255,0.6), -2px 0 0 rgba(255,80,60,0.6);
+  letter-spacing: 0.01em;
+  animation: cs-quote-flicker 2.4s steps(6) infinite;
+}
+@keyframes cs-quote-flicker { 0%,100%{opacity:1;} 48%{opacity:0.82;} 52%{opacity:0.95;} }
+
+/* weapon-skin ticker rows in the ambient feeds */
+.cs-rar { font-size: 0.9em; }
+.cs-rar-mil { color: #4b69ff; }
+.cs-rar-res { color: #8847ff; }
+.cs-rar-class { color: #d32ee6; }
+.cs-rar-covert { color: #eb4b4b; }
+.cs-rar-knife { color: #ffd700; }
+.cs-wear { color: var(--text-dim); font-size: 0.82em; }
+
+/* CS stat rows in the system-monitor widget */
+.cs-stat { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--border); font-family: var(--mono); font-size: 0.8rem; }
+.cs-stat:last-child { border-bottom: none; }
+.cs-stat-label { color: var(--text-dim); }
+.cs-stat-val { color: #ff9628; font-weight: 600; }
+
+/* match / drop feed rows */
+.cs-drop { font-family: var(--mono); font-size: 0.78rem; padding: 4px 0; color: var(--text); }
+.cs-drop-ok { color: var(--ok); }
+.cs-drop-err { color: var(--danger); }
+.cs-drop-rare { color: #ffd700; }
+.cs-drop-muted { color: var(--text-dim); }
+
+.cs-exit {
+  position: fixed; top: 14px; left: 14px; z-index: 2001;
+  font-family: var(--mono); font-size: 0.78rem;
+  color: #ff9628; background: rgba(0,0,0,0.6);
+  border: 1px solid #ff9628; border-radius: var(--radius);
+  padding: 6px 12px; cursor: pointer;
+}
+.cs-exit:hover { background: #ff9628; color: #140a04; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-overlay-quote { animation: none; }
 }

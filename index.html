@@ -179,27 +179,7 @@
     </div>
   </header>
 
-  <!-- KPI strip -->
   <div class="rv-wrap">
-    <div class="rv-kpis">
-      <div class="rv-kpi">
-        <span class="rv-kpi-num">20<span class="rv-kpi-plus">+</span></span>
-        <span class="rv-kpi-label">HTB machines pwned</span>
-      </div>
-      <div class="rv-kpi">
-        <span class="rv-kpi-num">10</span>
-        <span class="rv-kpi-label">HTB writeups</span>
-      </div>
-      <div class="rv-kpi">
-        <span class="rv-kpi-num">2</span>
-        <span class="rv-kpi-label">Certifications &amp; degree</span>
-      </div>
-      <div class="rv-kpi">
-        <span class="rv-kpi-num">4</span>
-        <span class="rv-kpi-label">Core capability areas</span>
-      </div>
-    </div>
-
     <!-- Capabilities -->
     <h2 class="rv-head"><span class="rv-prompt">$</span> capabilities</h2>
     <div class="rv-caps">
@@ -244,7 +224,7 @@
       </article>
     </div>
 
-    <p class="rv-more">Scroll on for featured projects, Hack The Box writeups and certifications ↓</p>
+    <p class="rv-more">Scroll on for certifications, projects and Hack The Box writeups ↓</p>
   </div>
 </section>
 
@@ -361,6 +341,22 @@
           <li>Git</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-certs" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> ls ./certs</h2>
+    <p class="section-sub">Click a row to open the certificate PDF. Drop files into <code>/certs</code> to populate this list.</p>
+
+    <div class="cert-table" role="table">
+      <div class="cert-row cert-head" role="row">
+        <span role="columnheader">certification</span>
+        <span role="columnheader">issuer</span>
+        <span role="columnheader">date</span>
+        <span role="columnheader"></span>
+      </div>
+      <div id="certTableBody" role="rowgroup"></div>
+      <p class="cert-empty" id="certEmptyState" hidden>no certifications uploaded yet — this is a prototype.</p>
     </div>
   </div>
 
@@ -482,22 +478,6 @@
 
       </div>
     </section>
-  </div>
-
-  <div class="panel" id="panel-certs" hidden>
-    <h2 class="section-head"><span class="prompt-inline">$</span> ls ./certs</h2>
-    <p class="section-sub">Click a row to open the certificate PDF. Drop files into <code>/certs</code> to populate this list.</p>
-
-    <div class="cert-table" role="table">
-      <div class="cert-row cert-head" role="row">
-        <span role="columnheader">certification</span>
-        <span role="columnheader">issuer</span>
-        <span role="columnheader">date</span>
-        <span role="columnheader"></span>
-      </div>
-      <div id="certTableBody" role="rowgroup"></div>
-      <p class="cert-empty" id="certEmptyState" hidden>no certifications uploaded yet — this is a prototype.</p>
-    </div>
   </div>
 
   <div class="panel" id="panel-writeups" hidden>

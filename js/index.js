@@ -9,6 +9,7 @@ import { ModeManager } from './modules/modes.js';
 import { Navigation } from './modules/navigation.js';
 import { Greeting } from './modules/greeting.js';
 import { NameGlitch } from './modules/glitch.js';
+import { CsMode } from './modules/csmode.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
 import { CHOICE_KEY } from './modules/config.js';
@@ -34,6 +35,11 @@ export class PortfolioApp {
     this.navigation = new Navigation({ modeManager: this.modes, terminal: this.terminal });
     this.greeting = new Greeting();
     this.nameGlitch = new NameGlitch();
+    this.csMode = new CsMode({
+      feeds: { dedsec: this.dedsecFeed, threat: this.threatFeed },
+      sysMonitor: this.sysMonitor,
+      githubActivity: this.githubActivity,
+    });
   }
 
   init() {
@@ -55,6 +61,7 @@ export class PortfolioApp {
       }
     };
     this.terminal.onRecruiterRequested = () => this.modes.toggleRecruiterMode();
+    this.terminal.onCsRequested = () => this.csMode.toggle();
     this.terminal.init();
 
     this.modes.init();
