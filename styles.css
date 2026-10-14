@@ -9,6 +9,7 @@
   --surface-2: #1c1915;
   --border: #322c23;
   --text: #ece5d8;         /* warm off-white */
+  --text-bright: #f6efe2;  /* brightest headings */
   --text-dim: #948a78;
   --accent: #ff6a1a;       /* hot orange — links, highlights, primary */
   --accent-2: #ff9240;     /* lighter orange, for hover/glow states */
@@ -24,9 +25,66 @@
   --sans: 'Inter', system-ui, sans-serif;
   --font-binary: 'Share Tech Mono', 'VT323', ui-monospace, monospace;
 
-  --radius: 3px;
+  --nav-bg: rgba(12, 11, 9, 0.85);
+  --radius: 0;
   --maxw: 880px;
 }
+
+/* ---- Light theme ---- */
+html[data-theme="light"] {
+  --bg: #f4efe4;           /* warm paper */
+  --surface: #fbf8f1;
+  --surface-2: #ece4d4;
+  --border: #d9cdb6;
+  --text: #2a241c;
+  --text-bright: #140f09;
+  --text-dim: #6f6453;
+  --accent: #cf540d;       /* deeper orange for contrast on light */
+  --accent-2: #b2470a;
+  --accent-dim: #e7b991;
+  --warn: #b7791f;
+  --danger: #c0392b;
+  --insane: #8e44ad;
+  --ok: #4e8a3c;
+  --cyber-cyan: #0e87c4;
+  --cyber-green: #159340;
+  --nav-bg: rgba(244, 239, 228, 0.85);
+}
+
+/* ---- Theme transition: circular reveal (Hyprland-style) ---- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+/* the new theme sits on top and is revealed by the JS-driven circle */
+::view-transition-new(root) { z-index: 1; }
+::view-transition-old(root) { z-index: 0; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}
+
+/* ---- Theme toggle button ---- */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px; height: 34px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.16s ease, border-color 0.16s ease;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-ic-sun { display: none; }
+.theme-ic-moon { display: block; }
+html[data-theme="light"] .theme-ic-sun { display: block; }
+html[data-theme="light"] .theme-ic-moon { display: none; }
 
 body[data-terminal="off"] { --maxw: 1060px; }
 
@@ -58,7 +116,7 @@ a:focus-visible, button:focus-visible {
   outline-offset: 2px;
 }
 
-h1, h2, h3 { font-family: var(--mono); font-weight: 600; margin: 0; color: #f6efe2; }
+h1, h2, h3 { font-family: var(--mono); font-weight: 600; margin: 0; color: var(--text-bright); }
 
 /* ===========================================================
    NAV
@@ -67,7 +125,7 @@ h1, h2, h3 { font-family: var(--mono); font-weight: 600; margin: 0; color: #f6ef
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(12, 11, 9, 0.85);
+  background: var(--nav-bg);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
 }
@@ -194,6 +252,8 @@ body[data-terminal="off"] .nav-recruiter {
   }
   .nav-links.open { display: flex; }
   .nav-toggle { display: block; }
+  /* keep the nav from overflowing: switch shows without its text label */
+  .recruiter-toggle-label { display: none; }
 }
 
 /* ===========================================================
@@ -266,17 +326,7 @@ body[data-terminal="off"] .nav-recruiter {
   min-height: 300px;
   overflow-y: auto;
   max-height: 400px;
-  background: radial-gradient(circle at 50% 20%, rgba(35, 27, 20, 0.5) 0%, rgba(21, 19, 16, 0.98) 100%);
-}
-.terminal-body::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-  background-size: 100% 4px;
-  pointer-events: none;
-  opacity: 0.35;
-  z-index: 1;
+  background: var(--surface);
 }
 .terminal-body > * {
   position: relative;
@@ -354,6 +404,15 @@ body[data-terminal="off"] .nav-recruiter {
   vertical-align: text-bottom;
   animation: blink 1s steps(1) infinite;
   margin-left: 2px;
+}
+
+/* highlighted keyword in terminal output (e.g. `help`) */
+.term-hl {
+  color: var(--accent);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  padding: 0 5px;
+  border-radius: 3px;
 }
 
 .terminal-input-row {
@@ -597,7 +656,7 @@ body[data-terminal="off"] .nav-recruiter {
   margin-top: 28px;
 }
 .about-text p { margin: 0 0 14px; color: var(--text); max-width: 62ch; }
-.about-text strong { color: #f6efe2; }
+.about-text strong { color: var(--text-bright); }
 
 .skills-label {
   font-family: var(--mono);
@@ -649,6 +708,32 @@ body[data-terminal="off"] .nav-recruiter {
 .card p { margin: 0; color: var(--text-dim); font-size: 0.9rem; flex-grow: 1; }
 .card-links { display: flex; gap: 16px; font-family: var(--mono); font-size: 0.8rem; }
 
+.proj-group { margin-top: 36px; }
+.proj-group:first-of-type { margin-top: 28px; }
+.proj-group-head {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--text);
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.proj-group-head .prompt-inline { color: var(--text-dim); margin-right: 0; }
+.proj-group-sub { margin: 8px 0 0; color: var(--text-dim); font-size: 0.85rem; }
+.proj-group .card-grid { margin-top: 16px; }
+
+.card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.card-status {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.card-status.status-wip { color: var(--accent); border-color: var(--accent-dim); }
+.card-status.status-live { color: var(--ok); border-color: currentColor; }
+
 /* ===========================================================
    WRITEUPS TABLE
    =========================================================== */
@@ -676,8 +761,22 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
   background: var(--surface-2);
   text-transform: lowercase;
 }
-.wt-name { font-family: var(--mono); color: #f6efe2; }
+.wt-name { font-family: var(--mono); color: var(--text-bright); }
 .wt-date { color: var(--text-dim); font-family: var(--mono); font-size: 0.82rem; }
+.wt-row.wt-stub .wt-name { color: var(--text-dim); }
+.wt-missing {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  color: var(--warn);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius);
+  padding: 1px 6px;
+  margin-right: 8px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.wt-na { color: var(--text-dim); font-family: var(--mono); }
 
 .wu-notice {
   display: flex;
@@ -825,7 +924,7 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
   position: absolute;
   z-index: 1;
   width: 240px;
-  background: rgba(21, 19, 16, 0.92);
+  background: var(--surface);
   backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1040,7 +1139,7 @@ body[data-terminal="off"] .panel { animation: none; }
   text-transform: lowercase;
   cursor: default;
 }
-.cert-name { color: #f6efe2; font-weight: 500; }
+.cert-name { color: var(--text-bright); font-weight: 500; }
 .cert-issuer, .cert-date { color: var(--text-dim); font-family: var(--mono); font-size: 0.82rem; }
 .cert-view { font-family: var(--mono); color: var(--accent); font-size: 0.8rem; white-space: nowrap; }
 .cert-empty { margin: 0; padding: 18px 16px; color: var(--text-dim); font-family: var(--mono); font-size: 0.84rem; }
@@ -1097,3 +1196,512 @@ body[data-terminal="off"] .panel { animation: none; }
 .cert-viewer-close { background: none; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim); width: 26px; height: 26px; cursor: pointer; line-height: 1; }
 .cert-viewer-close:hover { color: var(--accent); border-color: var(--accent); }
 .cert-viewer-frame { flex: 1; border: none; background: #fff; }
+
+/* ===========================================================
+   INTRO GATE — first-visit view chooser
+   =========================================================== */
+.intro-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(255, 106, 26, 0.08), transparent 60%),
+    var(--bg, #0e0c0a);
+  overflow-y: auto;
+  animation: gate-fade-in 0.35s ease;
+}
+/* returning visitors (set before first paint) never see it */
+html[data-gate="hidden"] .intro-gate { display: none !important; }
+/* after a choice, fade out */
+.intro-gate.intro-gate--dismissed { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+
+@keyframes gate-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.intro-gate-inner { width: 100%; max-width: 760px; text-align: center; }
+.intro-gate-brand {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+.intro-gate-brand .nav-sep { color: var(--accent); }
+.intro-gate-name {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  margin: 14px 0 6px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.intro-gate-role { color: var(--text-dim); font-size: 0.95rem; margin: 0 0 32px; }
+.intro-gate-prompt {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin: 0 0 20px;
+}
+.intro-gate-prompt::before { content: "$ "; color: var(--text-dim); }
+
+.intro-gate-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  text-align: left;
+}
+.intro-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 26px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+.intro-card:hover,
+.intro-card:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  background: var(--surface-2);
+  outline: none;
+}
+.intro-card-icon {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.intro-card-tech .intro-card-icon { color: var(--accent); }
+.intro-card-title { font-size: 1.05rem; font-weight: 600; color: var(--text); }
+.intro-card-desc { color: var(--text-dim); font-size: 0.88rem; line-height: 1.55; flex-grow: 1; }
+.intro-card-cta {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-top: 6px;
+}
+.intro-gate-note {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin: 28px 0 0;
+}
+
+@media (max-width: 600px) {
+  .intro-gate-choices { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-gate, .intro-card { animation: none; transition: none; }
+  .intro-card:hover, .intro-card:focus-visible { transform: none; }
+}
+
+/* ===========================================================
+   RECRUITER VIEW — overhauled, shown only when terminal is off
+   =========================================================== */
+#recruiter-view { display: none; }
+body[data-terminal="off"] #recruiter-view { display: block; }
+/* the overhaul replaces the old plain text recruiter box + skills list */
+body[data-terminal="off"] #panel-recruiter,
+body[data-terminal="off"] #panel-skills { display: none !important; }
+
+.rv { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+/* ---- Hero ---- */
+.rv-hero {
+  position: relative;
+  padding: 72px 0 48px;
+}
+.rv-hero-inner { position: relative; z-index: 1; }
+
+.rv-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.78rem; color: var(--ok);
+  border: 1px solid color-mix(in srgb, var(--ok) 45%, transparent);
+  background: color-mix(in srgb, var(--ok) 10%, transparent);
+  padding: 5px 12px; margin-bottom: 22px;
+}
+.rv-status-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--ok);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 70%, transparent);
+  animation: rv-pulse 2s ease-out infinite;
+}
+@keyframes rv-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); }
+  70% { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.rv-greet-line {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.1; margin: 0 0 12px; color: var(--text);
+  letter-spacing: -0.015em; font-weight: 700;
+}
+.rv-greet {
+  display: inline-block; color: var(--accent);
+  transition: opacity 0.32s ease, transform 0.32s ease;
+  min-width: 1.2em;
+}
+.rv-greet.greet-out { opacity: 0; transform: translateY(-8px); }
+.rv-name { color: var(--text); }
+.rv-role {
+  font-family: var(--mono); color: var(--text-dim);
+  font-size: clamp(0.85rem, 2vw, 1rem); margin: 0 0 20px;
+}
+.rv-role .rv-sep { color: var(--accent); }
+.rv-pitch { color: var(--text); max-width: 64ch; line-height: 1.7; margin: 0 0 28px; font-size: 1rem; }
+.rv-pitch strong { color: var(--text-bright); }
+
+.rv-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+.rv-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.84rem;
+  padding: 10px 16px; border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); background: var(--surface);
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+}
+.rv-btn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; transform: translateY(-2px); }
+.rv-btn-primary { background: var(--accent); border-color: var(--accent); color: #140a04; font-weight: 600; }
+.rv-btn-primary:hover { background: var(--accent-2); border-color: var(--accent-2); color: #140a04; }
+.rv-btn-icon { padding: 10px 12px; }
+
+.rv-facts {
+  display: flex; flex-wrap: wrap; gap: 10px 36px; margin: 0;
+  padding-top: 24px; border-top: 1px dashed var(--border);
+}
+.rv-facts div { display: flex; flex-direction: column; gap: 3px; }
+.rv-facts dt { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+.rv-facts dd { margin: 0; font-size: 0.92rem; color: var(--text); }
+
+/* ---- shared wrap + section head ---- */
+.rv-wrap { padding: 44px 0 8px; }
+.rv-head { font-family: var(--mono); font-size: 1.05rem; color: var(--text); margin: 0 0 18px; }
+.rv-head .rv-prompt { color: var(--accent); margin-right: 8px; }
+
+/* ---- capability cards ---- */
+.rv-caps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.rv-cap {
+  border: 1px solid var(--border);
+  background: var(--surface); padding: 20px;
+}
+.rv-cap-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.rv-cap-top h3 { font-size: 1rem; color: var(--text); margin: 0; }
+.rv-cap-ic { flex-shrink: 0; }
+.rv-cap-off .rv-cap-ic { color: var(--accent); }
+.rv-cap-def .rv-cap-ic { color: var(--ok); }
+.rv-cap-net .rv-cap-ic { color: var(--cyber-cyan); }
+.rv-cap-dev .rv-cap-ic { color: var(--warn); }
+.rv-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; }
+.rv-chips li {
+  font-family: var(--mono); font-size: 0.74rem; color: var(--text);
+  border: 1px solid var(--border); background: var(--surface-2);
+  padding: 4px 9px; border-radius: var(--radius);
+}
+
+.rv-more { text-align: center; font-family: var(--mono); font-size: 0.82rem; color: var(--text-dim); margin: 40px 0 0; }
+
+@media (max-width: 720px) {
+  .rv-caps { grid-template-columns: 1fr; }
+  .rv-hero { padding-top: 52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-hero::before, .rv-status-dot { animation: none; }
+  .rv-greet { transition: none; }
+  .rv-btn:hover { transform: none; }
+}
+
+/* ---- hero name glitch (recruiter view) ---- */
+.rv-name { position: relative; display: inline-block; }
+.rv-name--typing { border-right: 2px solid var(--accent); animation: rv-caret 0.7s steps(1) infinite; }
+@keyframes rv-caret { 50% { border-right-color: transparent; } }
+
+.rv-name--glitch { animation: rv-skew 0.4s steps(3, end) infinite; }
+.rv-name--glitch::before,
+.rv-name--glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.rv-name--glitch::before {
+  color: var(--cyber-cyan);
+  animation: rv-glitch-1 0.5s steps(2, end) infinite;
+}
+.rv-name--glitch::after {
+  color: var(--danger);
+  animation: rv-glitch-2 0.46s steps(2, end) infinite;
+}
+@keyframes rv-skew {
+  0% { transform: skewX(0deg); }
+  33% { transform: skewX(1.8deg); }
+  66% { transform: skewX(-1.4deg); }
+  100% { transform: skewX(0deg); }
+}
+@keyframes rv-glitch-1 {
+  0%   { clip-path: inset(0 0 82% 0);  transform: translate(-2px, -1px); }
+  20%  { clip-path: inset(38% 0 40% 0); transform: translate(2px, 1px); }
+  40%  { clip-path: inset(68% 0 10% 0); transform: translate(-1px, 0); }
+  60%  { clip-path: inset(18% 0 58% 0); transform: translate(2px, -1px); }
+  80%  { clip-path: inset(52% 0 22% 0); transform: translate(-2px, 1px); }
+  100% { clip-path: inset(8% 0 76% 0);  transform: translate(1px, 0); }
+}
+@keyframes rv-glitch-2 {
+  0%   { clip-path: inset(72% 0 8% 0);  transform: translate(2px, 1px); }
+  20%  { clip-path: inset(12% 0 66% 0); transform: translate(-2px, -1px); }
+  40%  { clip-path: inset(46% 0 30% 0); transform: translate(1px, 1px); }
+  60%  { clip-path: inset(80% 0 4% 0);  transform: translate(-2px, 0); }
+  80%  { clip-path: inset(24% 0 54% 0); transform: translate(2px, -1px); }
+  100% { clip-path: inset(60% 0 20% 0); transform: translate(-1px, 1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-name--glitch { animation: none; }
+  .rv-name--glitch::before, .rv-name--glitch::after { display: none; }
+  .rv-name--typing { animation: none; border-right-color: transparent; }
+}
+
+/* ===========================================================
+   CS MODE (hidden `sudo cs` easter egg)
+   =========================================================== */
+/* CS mode is always a dark neon scene — force dark tokens even in light theme */
+body.cs-mode {
+  --bg: #0a0907;
+  --surface: #141210;
+  --surface-2: #1c1915;
+  --border: #322c23;
+  --text: #ece5d8;
+  --text-bright: #f6efe2;
+  --text-dim: #948a78;
+  --nav-bg: rgba(12, 11, 9, 0.85);
+  background: #0a0907;
+}
+.cs-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+/* hide the OS cursor while the crosshair is drawn */
+body.cs-nocursor, body.cs-nocursor * { cursor: none !important; }
+/* keep real content above the canvas */
+body.cs-mode .nav,
+body.cs-mode .hero,
+body.cs-mode #viewport,
+body.cs-mode .footer { position: relative; z-index: 1; }
+
+.cs-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0; transition: opacity 0.5s ease;
+  padding: 24px; text-align: center;
+}
+.cs-overlay--in { opacity: 1; }
+.cs-overlay--out { opacity: 0; }
+.cs-overlay-quote {
+  font-family: var(--mono);
+  font-size: clamp(1.3rem, 5vw, 2.8rem);
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 0 18px rgba(255, 150, 40, 0.7), 2px 0 0 rgba(90,200,255,0.6), -2px 0 0 rgba(255,80,60,0.6);
+  letter-spacing: 0.01em;
+  animation: cs-quote-flicker 2.4s steps(6) infinite;
+}
+@keyframes cs-quote-flicker { 0%,100%{opacity:1;} 48%{opacity:0.82;} 52%{opacity:0.95;} }
+
+/* weapon-skin ticker rows in the ambient feeds */
+.cs-rar { font-size: 0.9em; }
+.cs-rar-mil { color: #4b69ff; }
+.cs-rar-res { color: #8847ff; }
+.cs-rar-class { color: #d32ee6; }
+.cs-rar-covert { color: #eb4b4b; }
+.cs-rar-knife { color: #ffd700; }
+.cs-wear { color: var(--text-dim); font-size: 0.82em; }
+
+/* CS stat rows in the system-monitor widget */
+.cs-stat { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--border); font-family: var(--mono); font-size: 0.8rem; }
+.cs-stat:last-child { border-bottom: none; }
+.cs-stat-label { color: var(--text-dim); }
+.cs-stat-val { color: #ff9628; font-weight: 600; }
+
+/* match / drop feed rows */
+.cs-drop { font-family: var(--mono); font-size: 0.78rem; padding: 4px 0; color: var(--text); }
+.cs-drop-ok { color: var(--ok); }
+.cs-drop-err { color: var(--danger); }
+.cs-drop-rare { color: #ffd700; }
+.cs-drop-muted { color: var(--text-dim); }
+
+.cs-exit {
+  position: fixed; top: 14px; left: 14px; z-index: 2001;
+  font-family: var(--mono); font-size: 0.78rem;
+  color: #ff9628; background: rgba(0,0,0,0.6);
+  border: 1px solid #ff9628; border-radius: var(--radius);
+  padding: 6px 12px; cursor: pointer;
+}
+.cs-exit:hover { background: #ff9628; color: #140a04; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-overlay-quote { animation: none; }
+}
+
+/* ===========================================================
+   TYPEWRITER SECTIONS — heading types, then the body fades in
+   =========================================================== */
+.tw { white-space: pre-wrap; }
+.tw-section .tw::after {
+  content: "▋";
+  margin-left: 1px;
+  color: var(--accent);
+  animation: blink 1s steps(1) infinite;
+}
+.tw-section.tw-in .tw::after { content: none; }
+
+.tw-section > :not(.section-head):not(.rv-head) {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.tw-section.tw-in > :not(.section-head):not(.rv-head) {
+  opacity: 1;
+  transform: none;
+}
+.tw-section.tw-noanim > :not(.section-head):not(.rv-head) { transition: none !important; }
+
+/* ---- recruiter hero entry: fade-IN only, staged ---- */
+/* every hero part starts hidden; JS reveals them one at a time with .rv-in */
+.rv-hero-inner .rv-status,
+.rv-hero-inner .rv-role,
+.rv-hero-inner .rv-pitch,
+.rv-hero-inner .rv-cta,
+.rv-hero-inner .rv-facts {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.rv-hero-inner .rv-status.rv-in,
+.rv-hero-inner .rv-role.rv-in,
+.rv-hero-inner .rv-pitch.rv-in,
+.rv-hero-inner .rv-cta.rv-in,
+.rv-hero-inner .rv-facts.rv-in {
+  opacity: 1;
+  transform: none;
+}
+/* instant reset (no fade-out) when re-entering recruiter mode */
+.rv-hero-inner.no-anim .rv-status,
+.rv-hero-inner.no-anim .rv-role,
+.rv-hero-inner.no-anim .rv-pitch,
+.rv-hero-inner.no-anim .rv-cta,
+.rv-hero-inner.no-anim .rv-facts { transition: none !important; }
+
+/* typewriter caret on whichever span is being typed */
+.tw-caret::after {
+  content: "▋"; color: var(--accent); margin-left: 1px;
+  animation: blink 1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-hero-inner .rv-status,
+  .rv-hero-inner .rv-role,
+  .rv-hero-inner .rv-pitch,
+  .rv-hero-inner .rv-cta,
+  .rv-hero-inner .rv-facts { opacity: 1 !important; transform: none !important; transition: none; }
+  .tw-caret::after { content: none; }
+}
+
+/* ---- one-time pop-in for the ambient .log feeds on terminal start ---- */
+@keyframes feedPopDedsec {
+  0%   { opacity: 0; transform: translateY(-50%) rotate(-2.5deg) scale(0.8); }
+  100% { opacity: 1; transform: translateY(-50%) rotate(-2.5deg) scale(1); }
+}
+@keyframes feedPopThreat {
+  0%   { opacity: 0; transform: rotate(2.5deg) scale(0.8); }
+  100% { opacity: 1; transform: rotate(2.5deg) scale(1); }
+}
+.dedsec-feed.feed-pop { animation: feedPopDedsec 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.threat-feed.feed-pop { animation: feedPopThreat 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tw-section > :not(.section-head):not(.rv-head) { opacity: 1 !important; transform: none !important; transition: none; }
+  .tw-section .tw::after, .rv-hero-inner.hero-intro #heroName::after { content: none; }
+  .dedsec-feed.feed-pop, .threat-feed.feed-pop { animation: none; }
+}
+
+/* ===========================================================
+   FLOATING BLOB — single orange glow, dark theme only
+   =========================================================== */
+/* wrapper clips the blob to the viewport so it never creates scroll */
+.bg-blob-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bg-blob {
+  position: absolute;
+  top: 0; left: 0;
+  width: 60vmax; height: 60vmax;
+  margin-left: -30vmax; margin-top: -30vmax;  /* so translate() centers it */
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 106, 26, 0.30), transparent 68%);
+  filter: blur(80px);
+  pointer-events: none;
+  display: none;
+  will-change: transform;
+}
+html[data-theme="dark"] .bg-blob { display: block; }
+body.cs-mode .bg-blob { display: none !important; }
+
+/* ===========================================================
+   RECRUITER TIMELINE — dot + line connectors down the sections
+   =========================================================== */
+body[data-terminal="off"] .rv-node { position: relative; }
+body[data-terminal="off"] .rv-hero-inner,
+body[data-terminal="off"] #recruiter-view .rv-node,
+body[data-terminal="off"] #viewport .rv-node { padding-left: 44px; }
+
+body[data-terminal="off"] .rv-node::before {
+  content: "";
+  position: absolute;
+  left: 13px; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+body[data-terminal="off"] .rv-node::after {
+  content: "";
+  position: absolute;
+  left: 6px; top: 46px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  box-sizing: border-box;
+}
+/* cap the line at the first and last dots */
+body[data-terminal="off"] .rv-node--first::before { top: 46px; }
+body[data-terminal="off"] .rv-node--last::before { bottom: auto; height: 54px; }
+
+/* ===========================================================
+   MERGED RESUME + CONTACT — two spaced columns in recruiter mode
+   =========================================================== */
+body[data-terminal="off"] .rc-merge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(36px, 11vw, 150px);
+  border-top: 1px solid var(--border);
+  padding-block: 44px;
+}
+body[data-terminal="off"] #viewport .rc-merge > .panel {
+  flex: 1 1 260px;
+  min-width: 0;
+  padding: 0;
+  border-top: none;
+}
+
+/* timeline: tighter on phones so wide content doesn't overflow */
+@media (max-width: 600px) {
+  body[data-terminal="off"] .rv-hero-inner { padding-left: 0; }
+  body[data-terminal="off"] #recruiter-view .rv-node,
+  body[data-terminal="off"] #viewport .rv-node { padding-left: 24px; }
+  body[data-terminal="off"] .rv-node::before { left: 6px; }
+  body[data-terminal="off"] .rv-node::after { left: 0; top: 44px; width: 13px; height: 13px; }
+  body[data-terminal="off"] .rv-node--first::before { top: 44px; }
+}

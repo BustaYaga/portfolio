@@ -10,8 +10,56 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script>
+  // Hide the intro gate before first paint for returning visitors who already
+  // chose a view, so there is no flash of the choice screen.
+  try {
+    if (localStorage.getItem('portfolio-visitor-choice')) {
+      document.documentElement.setAttribute('data-gate', 'hidden');
+    }
+  } catch (e) {}
+  // Apply saved theme before first paint (no flash). Default: dark.
+  try {
+    document.documentElement.setAttribute(
+      'data-theme',
+      localStorage.getItem('portfolio-theme') === 'light' ? 'light' : 'dark'
+    );
+  } catch (e) {}
+</script>
 </head>
 <body>
+
+<!-- ambient background: single orange glow (dark theme only) -->
+<div class="bg-blob-wrap" aria-hidden="true"><div class="bg-blob"></div></div>
+
+<!-- ============ INTRO GATE (first-visit view chooser) ============ -->
+<div class="intro-gate" id="intro-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <noscript><style>#intro-gate{display:none !important;}</style></noscript>
+  <div class="intro-gate-inner">
+    <span class="intro-gate-brand">anmol@portfolio<span class="nav-sep">:~$</span></span>
+    <h1 class="intro-gate-name" id="gate-title">Anmol Chaudhary</h1>
+    <p class="intro-gate-role">Cybersecurity Analyst &amp; Developer — seeking entry-level roles</p>
+    <p class="intro-gate-prompt">How would you like to view this portfolio?</p>
+
+    <div class="intro-gate-choices">
+      <button type="button" class="intro-card" data-gate-choice="recruiter">
+        <span class="intro-card-icon" aria-hidden="true">👔</span>
+        <span class="intro-card-title">Recruiter / Non-technical</span>
+        <span class="intro-card-desc">A clean, readable overview — summary, skills, experience and resume.</span>
+        <span class="intro-card-cta">View portfolio →</span>
+      </button>
+
+      <button type="button" class="intro-card intro-card-tech" data-gate-choice="technical">
+        <span class="intro-card-icon" aria-hidden="true">&gt;_</span>
+        <span class="intro-card-title">Developer / Technical</span>
+        <span class="intro-card-desc">Interactive terminal, live dashboards and Hack The Box writeups.</span>
+        <span class="intro-card-cta">Launch terminal →</span>
+      </button>
+    </div>
+
+    <p class="intro-gate-note">You can switch views anytime from the toggle in the top-right.</p>
+  </div>
+</div>
 
 <!-- ============ NAV ============ -->
 <header class="nav" id="nav">
@@ -26,6 +74,10 @@
       <!-- <a href="#" data-cmd="recruiter" class="nav-recruiter">recruiter mode</a> -->
     </nav>
     <div class="nav-controls">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light / dark theme">
+        <svg class="theme-ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+      </button>
       <button class="recruiter-toggle" id="recruiterToggle" role="switch" aria-checked="false" aria-label="Toggle recruiter mode">
         <span class="recruiter-toggle-label">recruiter mode</span>
         <span class="recruiter-toggle-track"><span class="recruiter-toggle-knob"></span></span>
@@ -91,6 +143,101 @@
 
     </div>
     <p class="hero-hint" data-content="hero.hint"></p>
+  </div>
+</section>
+
+<!-- ============ RECRUITER VIEW (shown only when terminal is off) ============ -->
+<section class="rv" id="recruiter-view" aria-label="Portfolio overview">
+
+  <!-- Hero -->
+  <header class="rv-hero">
+    <div class="rv-hero-inner">
+      <span class="rv-status"><span class="rv-status-dot"></span>Available for work · Immediate</span>
+      <h1 class="rv-greet-line">
+        <span class="rv-greet" id="greetWord"></span><span class="rv-mid" id="greetMid"></span><span class="rv-name" id="heroName" data-text=""></span>
+      </h1>
+      <p class="rv-role">Cybersecurity Analyst <span class="rv-sep">/</span> Developer — Offensive Security, SOC &amp; SIEM, Network Forensics</p>
+      <p class="rv-pitch">
+        I break into things to understand how to defend them — hands-on across <strong>20+ Hack The Box machines</strong>,
+        Active Directory attacks, Wireshark packet forensics, and cloud detection engineering with Microsoft Sentinel (KQL).
+        Looking for an entry-level role securing infrastructure or building reliable systems.
+      </p>
+
+      <div class="rv-cta">
+        <a href="resumes/NetworkSecurityResume.pdf" class="rv-btn rv-btn-primary" download="Anmol_Chaudhary_Network_Security_Resume.pdf">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v9c0 5.52 4.48 10 10 10s10-4.48 10-10V7l-9-5z"></path><path d="M12 11a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"></path></svg>
+          Network Security Résumé
+        </a>
+        <a href="resumes/SoftwareDeveloperResume.pdf" class="rv-btn" download="Anmol_Chaudhary_Software_Developer_Resume.pdf">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline><line x1="10" y1="22" x2="14" y2="2"></line></svg>
+          Software Dev Résumé
+        </a>
+        <a href="mailto:anmolchaudhary8317@gmail.com" class="rv-btn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="18" x="1" y="6" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          Email
+        </a>
+        <a href="https://linkedin.com/in/anmolchaudhary01" class="rv-btn rv-btn-icon" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+        </a>
+        <a href="https://github.com/bustayaga" class="rv-btn rv-btn-icon" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+        </a>
+      </div>
+
+      <dl class="rv-facts">
+        <div><dt>Looking for</dt><dd>SOC / PenTest / Software Dev</dd></div>
+        <div><dt>Based in</dt><dd>Dehradun, India · Remote / Hybrid</dd></div>
+        <div><dt>Notice period</dt><dd>Immediate</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <div class="rv-wrap rv-node rv-node--first tw-section">
+    <!-- Capabilities -->
+    <h2 class="rv-head"><span class="rv-prompt">$</span> capabilities</h2>
+    <div class="rv-caps">
+      <article class="rv-cap rv-cap-off">
+        <div class="rv-cap-top">
+          <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="2"/></svg>
+          <h3>Offensive Security</h3>
+        </div>
+        <ul class="rv-chips">
+          <li>Burp Suite</li><li>Metasploit</li><li>BloodHound</li><li>NetExec</li><li>Gobuster</li><li>Hydra</li><li>Hashcat</li><li>LinPEAS</li><li>Python exploit scripting</li>
+        </ul>
+      </article>
+
+      <article class="rv-cap rv-cap-def">
+        <div class="rv-cap-top">
+          <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v6c0 5 3.8 8.5 9 9 5.2-.5 9-4 9-9V7l-9-5z"/><path d="m9 12 2 2 4-4"/></svg>
+          <h3>Defensive · SOC &amp; SIEM</h3>
+        </div>
+        <ul class="rv-chips">
+          <li>Microsoft Sentinel</li><li>KQL</li><li>SIEM log triage</li><li>MITRE ATT&amp;CK</li><li>IOC hunting</li>
+        </ul>
+      </article>
+
+      <article class="rv-cap rv-cap-net">
+        <div class="rv-cap-top">
+          <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6.7 7.4 11 16m6.3-8.6L13 16M7 6h10"/></svg>
+          <h3>Networking &amp; Forensics</h3>
+        </div>
+        <ul class="rv-chips">
+          <li>Wireshark PCAP</li><li>TCP stream analysis</li><li>TCP/IP</li><li>DNS</li><li>DHCP</li><li>VLANs</li><li>Subnetting</li><li>OSI model</li>
+        </ul>
+      </article>
+
+      <article class="rv-cap rv-cap-dev">
+        <div class="rv-cap-top">
+          <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>
+          <h3>Systems &amp; Development</h3>
+        </div>
+        <ul class="rv-chips">
+          <li>Python</li><li>Bash</li><li>SQL</li><li>Linux (Kali/Ubuntu)</li><li>Windows Server</li><li>Active Directory</li><li>Docker</li><li>Git</li><li>Azure</li>
+        </ul>
+      </article>
+    </div>
+
+    <p class="rv-more">Scroll on for certifications, projects and Hack The Box writeups ↓</p>
   </div>
 </section>
 
@@ -179,7 +326,7 @@
     </div>
   </div>
 
-  <div class="panel" id="panel-skills" hidden>
+  <div class="panel tw-section" id="panel-skills" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> cat skills.md</h2>
     <div class="skills-grid">
       <div class="skills-text">
@@ -210,60 +357,7 @@
     </div>
   </div>
 
-  <div class="panel" id="panel-projects" hidden>
-    <h2 class="section-head"><span class="prompt-inline">$</span> ls ./projects</h2>
-    <div class="card-grid">
-
-      <article class="card">
-        <h3>Web App Exploitation & PrivEsc</h3>
-        <p data-content="projects.project1"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Python</li><li>Next.js</li><li>Burp Suite</li><li>Docker</li><li>PrivEsc</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-          <a href="writeups/reactor.html">writeup →</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Network Forensics & Active Directory</h3>
-        <p data-content="projects.project2"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Active Directory</li><li>Kerberos</li><li>BloodHound</li><li>Wireshark</li><li>NetExec</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-          <a href="writeups/layover.html">writeup →</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Cloud SIEM & Threat Detection</h3>
-        <p data-content="projects.project3"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Microsoft Azure</li><li>Microsoft Sentinel</li><li>KQL</li><li>MITRE ATT&CK</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Enterprise Integration & Web Debugging</h3>
-        <p data-content="projects.project4"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Node.js</li><li>Django</li><li>Docker</li><li>API Security</li><li>Linux</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-        </div>
-      </article>
-
-    </div>
-  </div>
-
-  <div class="panel" id="panel-certs" hidden>
+  <div class="panel rv-node tw-section" id="panel-certs" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> ls ./certs</h2>
     <p class="section-sub">Click a row to open the certificate PDF. Drop files into <code>/certs</code> to populate this list.</p>
 
@@ -279,7 +373,127 @@
     </div>
   </div>
 
-  <div class="panel" id="panel-writeups" hidden>
+  <div class="panel rv-node tw-section" id="panel-projects" hidden>
+    <h2 class="section-head"><span class="prompt-inline">$</span> ls ./projects</h2>
+
+    <section class="proj-group" aria-labelledby="proj-tools">
+      <h3 class="proj-group-head" id="proj-tools"><span class="prompt-inline">~/projects/</span>tools</h3>
+      <p class="proj-group-sub">Security and automation tooling I've built from scratch.</p>
+      <div class="card-grid">
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Vuln-Scanner</h3>
+            <span class="card-status status-wip">v0.1 · in dev</span>
+          </div>
+          <p data-content="projects.vulnScanner"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Python</li><li>NVD API</li><li>CPE/CVE</li><li>SQLite</li><li>Rich</li><li>Recon</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/BustaYaga/vuln-scanner" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <h3>CSFloat Dip Scanner</h3>
+            <span class="card-status status-live">automated</span>
+          </div>
+          <p data-content="projects.csfloater"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Python</li><li>Flask</li><li>REST APIs</li><li>SQLite</li><li>GitHub Actions</li><li>Cron</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/BustaYaga/csfloater" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="proj-group" aria-labelledby="proj-homelabs">
+      <h3 class="proj-group-head" id="proj-homelabs"><span class="prompt-inline">~/projects/</span>homelabs</h3>
+      <p class="proj-group-sub">Detection engineering and SIEM environments I've stood up and operated.</p>
+      <div class="card-grid">
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Cloud SIEM &amp; Threat Detection</h3>
+          </div>
+          <p data-content="projects.project3"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Microsoft Azure</li><li>Microsoft Sentinel</li><li>KQL</li><li>MITRE ATT&amp;CK</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <h3>SIEM &amp; SOC Toolkit</h3>
+          </div>
+          <p data-content="projects.siemToolkit"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Sentinel</li><li>KQL</li><li>Log Triage</li><li>IOC Hunting</li><li>Wireshark</li><li>MITRE ATT&amp;CK</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="proj-group" aria-labelledby="proj-labs">
+      <h3 class="proj-group-head" id="proj-labs"><span class="prompt-inline">~/projects/</span>offensive-labs</h3>
+      <p class="proj-group-sub">Hands-on exploitation, Active Directory and application security work.</p>
+      <div class="card-grid">
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Web App Exploitation &amp; PrivEsc</h3>
+          </div>
+          <p data-content="projects.project1"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Python</li><li>Next.js</li><li>Burp Suite</li><li>Docker</li><li>PrivEsc</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+            <a href="writeups/reactor.html">writeup →</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Network Forensics &amp; Active Directory</h3>
+          </div>
+          <p data-content="projects.project2"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Active Directory</li><li>Kerberos</li><li>BloodHound</li><li>Wireshark</li><li>NetExec</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+            <a href="writeups/layover.html">writeup →</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Enterprise Integration &amp; Web Debugging</h3>
+          </div>
+          <p data-content="projects.project4"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Node.js</li><li>Django</li><li>Docker</li><li>API Security</li><li>Linux</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+  </div>
+
+  <div class="panel rv-node tw-section" id="panel-writeups" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> ls -la ./writeups</h2>
     <p class="section-sub" data-content="writeups.sub"></p>
 
@@ -294,7 +508,7 @@
       <a class="wt-row" role="row" href="writeups/reactor.html">
         <span role="cell" class="wt-name">Reactor</span>
         <span role="cell"><span class="os-tag os-linux">Linux</span></span>
-        <span role="cell"><span class="diff-tag diff-medium">Medium</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
         <span role="cell" class="wt-date">2026-06-01</span>
       </a>
 
@@ -332,35 +546,135 @@
         <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
         <span role="cell" class="wt-date">2026-06-15</span>
       </a>
+
+      <a class="wt-row" role="row" href="writeups/touch.html">
+        <span role="cell" class="wt-name">Touch</span>
+        <span role="cell"><span class="os-tag os-windows">Windows</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date">2026-10-04</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/nimbus.html">
+        <span role="cell" class="wt-name">Nimbus</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-hard">Hard</span></span>
+        <span role="cell" class="wt-date">2026-06-24</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/checkpoint.html">
+        <span role="cell" class="wt-name">Checkpoint</span>
+        <span role="cell"><span class="os-tag os-windows">Windows</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date">2026-06-13</span>
+      </a>
+
+      <a class="wt-row" role="row" href="writeups/facts.html">
+        <span role="cell" class="wt-name">Facts</span>
+        <span role="cell"><span class="os-tag os-linux">Linux</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date">2026-05-31</span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/cap.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Cap</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/silentium.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Silentium</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/conversor.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Conversor</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/expressway.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Expressway</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/soulmate.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Soulmate</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/codeparttwo.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>CodePartTwo</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/editor.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Editor</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/outbound.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Outbound</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/artificial.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Artificial</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-easy">Easy</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
+
+      <a class="wt-row wt-stub" role="row" href="writeups/voleur.html">
+        <span role="cell" class="wt-name"><span class="wt-missing">[MISSING WRITEUP]</span>Voleur</span>
+        <span role="cell"><span class="wt-na">—</span></span>
+        <span role="cell"><span class="diff-tag diff-medium">Medium</span></span>
+        <span role="cell" class="wt-date"><span class="wt-na">—</span></span>
+      </a>
     </div>
   </div>
 
-  <div class="panel" id="panel-resume" hidden>
-    <h2 class="section-head"><span class="prompt-inline">$</span> ./resume.sh --view</h2>
-    <div class="resume-box">
-      <p data-content="resume.note"></p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;">
-        <a href="resume.pdf" class="btn btn-primary" download="Anmol_Chaudhary_Resume.pdf">download primary resume.pdf</a>
-        <a href="resumes/NetworkSecurityResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Network_Security_Resume.pdf">network security resume (PDF)</a>
-        <a href="resumes/SoftwareDeveloperResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Software_Developer_Resume.pdf">software dev resume (PDF)</a>
+  <div class="rc-merge rv-node rv-node--last">
+    <div class="panel tw-section" id="panel-resume" hidden>
+      <h2 class="section-head"><span class="prompt-inline">$</span> ./resume.sh --view</h2>
+      <div class="resume-box">
+        <p data-content="resume.note"></p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;">
+          <a href="resume.pdf" class="btn btn-primary" download="Anmol_Chaudhary_Resume.pdf">download primary resume.pdf</a>
+          <a href="resumes/NetworkSecurityResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Network_Security_Resume.pdf">network security resume (PDF)</a>
+          <a href="resumes/SoftwareDeveloperResume.pdf" class="btn btn-ghost" download="Anmol_Chaudhary_Software_Developer_Resume.pdf">software dev resume (PDF)</a>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="panel" id="panel-contact" hidden>
-    <h2 class="section-head"><span class="prompt-inline">$</span> ./contact.sh</h2>
-    <div class="contact-row">
-      <a href="mailto:anmolchaudhary8317@gmail.com" class="contact-link">[email]<span>anmolchaudhary8317@gmail.com</span></a>
-      <a href="https://github.com/bustayaga" target="_blank" rel="noopener" class="contact-link">[github]<span>bustayaga</span></a>
-      <a href="https://linkedin.com/in/anmolchaudhary01" target="_blank" rel="noopener" class="contact-link">[linkedin]<span>anmolchaudhary01</span></a>
-      <a href="https://app.hackthebox.com/profile/bustayaga" target="_blank" rel="noopener" class="contact-link">[htb]<span>bustayaga</span></a>
+    <div class="panel tw-section" id="panel-contact" hidden>
+      <h2 class="section-head"><span class="prompt-inline">$</span> ./contact.sh</h2>
+      <div class="contact-row">
+        <a href="mailto:anmolchaudhary8317@gmail.com" class="contact-link">[email]<span>anmolchaudhary8317@gmail.com</span></a>
+        <a href="https://github.com/bustayaga" target="_blank" rel="noopener" class="contact-link">[github]<span>bustayaga</span></a>
+        <a href="https://linkedin.com/in/anmolchaudhary01" target="_blank" rel="noopener" class="contact-link">[linkedin]<span>anmolchaudhary01</span></a>
+        <a href="https://app.hackthebox.com/profile/bustayaga" target="_blank" rel="noopener" class="contact-link">[htb]<span>bustayaga</span></a>
+      </div>
     </div>
   </div>
 
 </section>
 
 <footer class="footer">
-  <p data-content="footer.tagline">&copy; <span id="year"></span> Anmol Chaudhary — built with nothing but HTML, CSS, and curiosity.</p>
+  <p data-content="footer.tagline">&copy; <span id="year"></span> Anmol Chaudhary</p>
 </footer>
 
 <!-- ============ CERTIFICATION PDF VIEWER ============ -->

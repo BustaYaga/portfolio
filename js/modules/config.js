@@ -14,7 +14,33 @@ export const WRITEUP_STATUS = {
 };
 
 export const STORAGE_KEY = 'portfolio-recruiter-mode';
+// Tracks whether a first-time visitor has picked a view at the intro gate.
+export const CHOICE_KEY = 'portfolio-visitor-choice';
 export const MAX_FEED_LINES = 6;
+
+// `sudo` easter egg: typing a bare `sudo` rolls SUDO_GRANT_CHANCE to become a
+// (fake) superuser; otherwise it prints a random sarcastic denial. Keep these
+// PG — no profanity.
+export const SUDO_GRANT_CHANCE = 0.3;
+export const SUDO_DENIALS = [
+  'guest is not in the sudoers file. this incident will be reported to /var/log/auth.log.',
+  'nice try. permission denied — and noted.',
+  'sudo: authentication failure. the server is judging you.',
+  'denied. this terminal runs on vibes, not privileges.',
+  'you are not in the sudoers file. this is a cry for help.',
+  'permission denied, but i admire the confidence.',
+  'request denied. have you tried turning your ambitions off and on again?',
+  'sudo: a password would be lovely. you appear to have none.',
+  'access denied. points for persistence, though.',
+  'nope. root is a privilege, not a personality trait.',
+];
+export const SUDO_GRANT =
+  "Fine! You're a super user now. Use `sudo help` for all available commands.";
+export const SUDO_HELP_LINES = [
+  'superuser commands unlocked:',
+  '  <span class="font-binary">[*]</span> <strong>sudo cs</strong>    : ...you really shouldn\'t. but go on.',
+  '  <span class="font-binary">[*]</span> <strong>sudo help</strong>  : this list',
+];
 
 export const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&

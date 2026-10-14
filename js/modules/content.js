@@ -20,6 +20,12 @@ export const PORTFOLIO_CONTENT = {
     },
 
   projects: {
+    vulnScanner:
+      'CLI network vulnerability scanner. Scans ports with recon profiles (quick, web, AD, full), grabs banners and probes HTTP/S to identify service versions, builds CPE strings and maps them to CVEs through the NVD API with a SQLite cache, and fingerprints web apps. Results are rendered as severity-coloured terminal reports.',
+    csfloater:
+      'Market-data pipeline that flags CS2 skin listings priced well below their baseline. Pulls live listings from the CSFloat API with rate-limit-aware pagination, builds first-party price history through a daily GitHub Actions snapshot job, and serves flagged deals on a Flask dashboard with background scanning.',
+    siemToolkit:
+      'The detection stack I work with day to day: writing KQL hunting queries and analytics rules in Microsoft Sentinel, triaging alerts from firewall, VM and web logs, mapping activity to MITRE ATT&CK techniques, and pivoting into packet captures with Wireshark to confirm IOCs.',
     project1:
       'Exploited IDOR, SSTI, and Next.js unauthenticated RCE (CVE-2025-55182) across 7 HTB targets. Escalated to root via Node.js V8 debug port hijacking, cron job write access, and pickle deserialization.',
     project2:
@@ -40,7 +46,7 @@ export const PORTFOLIO_CONTENT = {
 
   footer: {
     tagline:
-      '&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.',
+      '&copy; <span id="year"></span> Anmol Chaudhary',
   },
 
   // Ambient Threat Feed initial seed lines
