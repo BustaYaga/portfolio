@@ -74,12 +74,9 @@ export class Navigation {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         } else {
+          // runCommand opens the panel and scrolls it into view
           if (this.terminal) {
             this.terminal.runCommand(cmd);
-          }
-          const viewport = document.getElementById('viewport');
-          if (viewport) {
-            viewport.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }
       });
