@@ -324,17 +324,7 @@ body[data-terminal="off"] .nav-recruiter {
   min-height: 300px;
   overflow-y: auto;
   max-height: 400px;
-  background: radial-gradient(circle at 50% 20%, rgba(35, 27, 20, 0.5) 0%, rgba(21, 19, 16, 0.98) 100%);
-}
-.terminal-body::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-  background-size: 100% 4px;
-  pointer-events: none;
-  opacity: 0.35;
-  z-index: 1;
+  background: var(--surface);
 }
 .terminal-body > * {
   position: relative;
@@ -932,7 +922,7 @@ a.wt-row:hover { background: var(--surface); text-decoration: none; }
   position: absolute;
   z-index: 1;
   width: 240px;
-  background: rgba(21, 19, 16, 0.92);
+  background: var(--surface);
   backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1501,6 +1491,18 @@ body[data-terminal="off"] #panel-skills { display: none !important; }
 /* ===========================================================
    CS MODE (hidden `sudo cs` easter egg)
    =========================================================== */
+/* CS mode is always a dark neon scene — force dark tokens even in light theme */
+body.cs-mode {
+  --bg: #0a0907;
+  --surface: #141210;
+  --surface-2: #1c1915;
+  --border: #322c23;
+  --text: #ece5d8;
+  --text-bright: #f6efe2;
+  --text-dim: #948a78;
+  --nav-bg: rgba(12, 11, 9, 0.85);
+  background: #0a0907;
+}
 .cs-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 /* hide the OS cursor while the crosshair is drawn */
 body.cs-nocursor, body.cs-nocursor * { cursor: none !important; }
