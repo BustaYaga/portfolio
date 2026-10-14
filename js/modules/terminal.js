@@ -28,6 +28,7 @@ export class Terminal {
     this.commands = {};
     this.superuser = false;
     this.onCsRequested = null;
+    this.onThemeRequested = null;
     this.history = [];
     this.historyIndex = -1;
     this.onCommandExecuted = options.onCommandExecuted || null;
@@ -66,7 +67,8 @@ export class Terminal {
         '<span class="font-binary">[08]</span> <strong>contact</strong>     : ways to reach me',
         '<span class="font-binary">[09]</span> <strong>recruiter</strong>   : toggle recruiter mode (1 <-> 0)',
         '<span class="font-binary">[10]</span> <strong>home</strong>        : back to overview dashboard',
-        '<span class="font-binary">[11]</span> <strong>clear</strong>       : clear terminal screen',
+        '<span class="font-binary">[11]</span> <strong>theme</strong>       : toggle light / dark (or <code>theme light</code> / <code>theme dark</code>)',
+        '<span class="font-binary">[12]</span> <strong>clear</strong>       : clear terminal screen',
       ],
     }));
 
@@ -123,6 +125,12 @@ export class Terminal {
       return {
         print: ['toggling recruiter mode state (1 <-> 0)...'],
       };
+    });
+
+    this.registerCommand('theme', (args) => {
+      const mode = args && (args[0] === 'light' || args[0] === 'dark') ? args[0] : null;
+      if (this.onThemeRequested) this.onThemeRequested(mode);
+      return { print: [mode ? `switching to ${mode} theme ...` : 'toggling theme ...'] };
     });
 
     this.registerCommand('home', () => ({

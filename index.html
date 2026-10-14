@@ -30,7 +30,7 @@
 <body>
 
 <!-- ambient background: single orange glow (dark theme only) -->
-<div class="bg-blob" aria-hidden="true"></div>
+<div class="bg-blob-wrap" aria-hidden="true"><div class="bg-blob"></div></div>
 
 <!-- ============ INTRO GATE (first-visit view chooser) ============ -->
 <div class="intro-gate" id="intro-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
@@ -192,11 +192,11 @@
     </div>
   </header>
 
-  <div class="rv-wrap rv-node rv-node--first">
+  <div class="rv-wrap rv-node rv-node--first tw-section">
     <!-- Capabilities -->
     <h2 class="rv-head"><span class="rv-prompt">$</span> capabilities</h2>
     <div class="rv-caps">
-      <article class="rv-cap rv-cap-off rv-reveal">
+      <article class="rv-cap rv-cap-off">
         <div class="rv-cap-top">
           <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="2"/></svg>
           <h3>Offensive Security</h3>
@@ -206,7 +206,7 @@
         </ul>
       </article>
 
-      <article class="rv-cap rv-cap-def rv-reveal">
+      <article class="rv-cap rv-cap-def">
         <div class="rv-cap-top">
           <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v6c0 5 3.8 8.5 9 9 5.2-.5 9-4 9-9V7l-9-5z"/><path d="m9 12 2 2 4-4"/></svg>
           <h3>Defensive · SOC &amp; SIEM</h3>
@@ -216,7 +216,7 @@
         </ul>
       </article>
 
-      <article class="rv-cap rv-cap-net rv-reveal">
+      <article class="rv-cap rv-cap-net">
         <div class="rv-cap-top">
           <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6.7 7.4 11 16m6.3-8.6L13 16M7 6h10"/></svg>
           <h3>Networking &amp; Forensics</h3>
@@ -226,7 +226,7 @@
         </ul>
       </article>
 
-      <article class="rv-cap rv-cap-dev rv-reveal">
+      <article class="rv-cap rv-cap-dev">
         <div class="rv-cap-top">
           <svg class="rv-cap-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>
           <h3>Systems &amp; Development</h3>
@@ -326,7 +326,7 @@
     </div>
   </div>
 
-  <div class="panel" id="panel-skills" hidden>
+  <div class="panel tw-section" id="panel-skills" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> cat skills.md</h2>
     <div class="skills-grid">
       <div class="skills-text">
@@ -357,7 +357,7 @@
     </div>
   </div>
 
-  <div class="panel rv-reveal rv-node" id="panel-certs" hidden>
+  <div class="panel rv-node tw-section" id="panel-certs" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> ls ./certs</h2>
     <p class="section-sub">Click a row to open the certificate PDF. Drop files into <code>/certs</code> to populate this list.</p>
 
@@ -373,7 +373,7 @@
     </div>
   </div>
 
-  <div class="panel rv-reveal rv-node" id="panel-projects" hidden>
+  <div class="panel rv-node tw-section" id="panel-projects" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> ls ./projects</h2>
 
     <section class="proj-group" aria-labelledby="proj-tools">
@@ -493,7 +493,7 @@
     </section>
   </div>
 
-  <div class="panel rv-reveal rv-node" id="panel-writeups" hidden>
+  <div class="panel rv-node tw-section" id="panel-writeups" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> ls -la ./writeups</h2>
     <p class="section-sub" data-content="writeups.sub"></p>
 
@@ -648,7 +648,7 @@
   </div>
 
   <div class="rc-merge rv-node rv-node--last">
-    <div class="panel rv-reveal" id="panel-resume" hidden>
+    <div class="panel tw-section" id="panel-resume" hidden>
       <h2 class="section-head"><span class="prompt-inline">$</span> ./resume.sh --view</h2>
       <div class="resume-box">
         <p data-content="resume.note"></p>
@@ -660,7 +660,7 @@
       </div>
     </div>
 
-    <div class="panel rv-reveal" id="panel-contact" hidden>
+    <div class="panel tw-section" id="panel-contact" hidden>
       <h2 class="section-head"><span class="prompt-inline">$</span> ./contact.sh</h2>
       <div class="contact-row">
         <a href="mailto:anmolchaudhary8317@gmail.com" class="contact-link">[email]<span>anmolchaudhary8317@gmail.com</span></a>
@@ -674,7 +674,7 @@
 </section>
 
 <footer class="footer">
-  <p data-content="footer.tagline">&copy; <span id="year"></span> Anmol Chaudhary — built with nothing but HTML, CSS, and curiosity.</p>
+  <p data-content="footer.tagline">&copy; <span id="year"></span> Anmol Chaudhary</p>
 </footer>
 
 <!-- ============ CERTIFICATION PDF VIEWER ============ -->

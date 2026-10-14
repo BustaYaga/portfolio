@@ -35,7 +35,12 @@ export class Theme {
   }
 
   toggle(e) {
-    const next = this.current === 'light' ? 'dark' : 'light';
+    this.switchTo(this.current === 'light' ? 'dark' : 'light', e);
+  }
+
+  switchTo(next, e) {
+    if (next !== 'light' && next !== 'dark') return;
+    if (next === this.current) return;
 
     // No animation available / wanted — switch instantly.
     if (!document.startViewTransition || prefersReducedMotion()) {

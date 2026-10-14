@@ -371,6 +371,8 @@ export class CsMode {
     if (this.feeds.threat && this.feeds.threat.body) this.feeds.threat.body.innerHTML = '';
     if (this.feeds.dedsec && this.feeds.dedsec.start) this.feeds.dedsec.start();
     if (this.feeds.threat && this.feeds.threat.start) this.feeds.threat.start();
+    // Rebuild the system monitor (CS mode replaced its DOM), then resume it.
+    if (this.sysMonitor && this.sysMonitor.init) this.sysMonitor.init();
     if (this.sysMonitor && this.sysMonitor.start) this.sysMonitor.start();
     if (this.githubActivity && this.githubActivity.init) this.githubActivity.init();
   }

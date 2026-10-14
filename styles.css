@@ -252,6 +252,8 @@ body[data-terminal="off"] .nav-recruiter {
   }
   .nav-links.open { display: flex; }
   .nav-toggle { display: block; }
+  /* keep the nav from overflowing: switch shows without its text label */
+  .recruiter-toggle-label { display: none; }
 }
 
 /* ===========================================================
@@ -1542,49 +1544,96 @@ body.cs-mode .footer { position: relative; z-index: 1; }
 }
 
 /* ===========================================================
-   RECRUITER SCROLL REVEAL — sections fade + rise into view
-   (scoped to recruiter mode so terminal-mode panels are unaffected)
+   TYPEWRITER SECTIONS — heading types, then the body fades in
    =========================================================== */
-body[data-terminal="off"] .rv-reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1);
-  will-change: opacity, transform;
+.tw { white-space: pre-wrap; }
+.tw-section .tw::after {
+  content: "▋";
+  margin-left: 1px;
+  color: var(--accent);
+  animation: blink 1s steps(1) infinite;
 }
-body[data-terminal="off"] .rv-reveal.rv-reveal--in {
+.tw-section.tw-in .tw::after { content: none; }
+
+.tw-section > :not(.section-head):not(.rv-head) {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.tw-section.tw-in > :not(.section-head):not(.rv-head) {
   opacity: 1;
   transform: none;
 }
+
+/* ---- recruiter hero entry sequence ---- */
+.rv-hero-inner .rv-status,
+.rv-hero-inner .rv-role,
+.rv-hero-inner .rv-pitch,
+.rv-hero-inner .rv-cta,
+.rv-hero-inner .rv-facts {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.rv-hero-inner.hero-intro .rv-status,
+.rv-hero-inner.hero-intro .rv-role,
+.rv-hero-inner.hero-intro .rv-pitch,
+.rv-hero-inner.hero-intro .rv-cta,
+.rv-hero-inner.hero-intro .rv-facts {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.rv-hero-inner.hero-intro .rv-role { transition-delay: 0.05s; }
+.rv-hero-inner.hero-intro .rv-pitch { transition-delay: 0.1s; }
+.rv-hero-inner.hero-intro .rv-cta { transition-delay: 0.15s; }
+.rv-hero-inner.hero-intro .rv-facts { transition-delay: 0.2s; }
+/* the greeting caret while the hero name types */
+.rv-hero-inner.hero-intro #heroName::after {
+  content: "▋"; color: var(--accent); margin-left: 2px;
+  animation: blink 1s steps(1) infinite;
+}
+
+/* ---- one-time pop-in for the ambient .log feeds on terminal start ---- */
+@keyframes feedPopDedsec {
+  0%   { opacity: 0; transform: translateY(-50%) rotate(-2.5deg) scale(0.8); }
+  100% { opacity: 1; transform: translateY(-50%) rotate(-2.5deg) scale(1); }
+}
+@keyframes feedPopThreat {
+  0%   { opacity: 0; transform: rotate(2.5deg) scale(0.8); }
+  100% { opacity: 1; transform: rotate(2.5deg) scale(1); }
+}
+.dedsec-feed.feed-pop { animation: feedPopDedsec 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.threat-feed.feed-pop { animation: feedPopThreat 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
-  body[data-terminal="off"] .rv-reveal {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none;
-  }
+  .tw-section > :not(.section-head):not(.rv-head) { opacity: 1 !important; transform: none !important; transition: none; }
+  .tw-section .tw::after, .rv-hero-inner.hero-intro #heroName::after { content: none; }
+  .dedsec-feed.feed-pop, .threat-feed.feed-pop { animation: none; }
 }
 
 /* ===========================================================
    FLOATING BLOB — single orange glow, dark theme only
    =========================================================== */
-.bg-blob {
+/* wrapper clips the blob to the viewport so it never creates scroll */
+.bg-blob-wrap {
   position: fixed;
+  inset: 0;
   z-index: -1;
-  width: 62vmax; height: 62vmax;
-  top: -16vmax; left: -12vmax;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bg-blob {
+  position: absolute;
+  top: 0; left: 0;
+  width: 60vmax; height: 60vmax;
+  margin-left: -30vmax; margin-top: -30vmax;  /* so translate() centers it */
   border-radius: 50%;
   background: radial-gradient(circle at 50% 50%, rgba(255, 106, 26, 0.30), transparent 68%);
   filter: blur(80px);
   pointer-events: none;
   display: none;
-  animation: blobDrift 36s ease-in-out infinite;
+  will-change: transform;
 }
 html[data-theme="dark"] .bg-blob { display: block; }
 body.cs-mode .bg-blob { display: none !important; }
-@keyframes blobDrift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%      { transform: translate(20vmax, 16vmax) scale(1.18); }
-}
-@media (prefers-reduced-motion: reduce) { .bg-blob { animation: none; } }
 
 /* ===========================================================
    RECRUITER TIMELINE — dot + line connectors down the sections
@@ -1630,4 +1679,14 @@ body[data-terminal="off"] #viewport .rc-merge > .panel {
   min-width: 0;
   padding: 0;
   border-top: none;
+}
+
+/* timeline: tighter on phones so wide content doesn't overflow */
+@media (max-width: 600px) {
+  body[data-terminal="off"] .rv-hero-inner { padding-left: 0; }
+  body[data-terminal="off"] #recruiter-view .rv-node,
+  body[data-terminal="off"] #viewport .rv-node { padding-left: 24px; }
+  body[data-terminal="off"] .rv-node::before { left: 6px; }
+  body[data-terminal="off"] .rv-node::after { left: 0; top: 44px; width: 13px; height: 13px; }
+  body[data-terminal="off"] .rv-node--first::before { top: 44px; }
 }
