@@ -212,55 +212,122 @@
 
   <div class="panel" id="panel-projects" hidden>
     <h2 class="section-head"><span class="prompt-inline">$</span> ls ./projects</h2>
-    <div class="card-grid">
 
-      <article class="card">
-        <h3>Web App Exploitation & PrivEsc</h3>
-        <p data-content="projects.project1"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Python</li><li>Next.js</li><li>Burp Suite</li><li>Docker</li><li>PrivEsc</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-          <a href="writeups/reactor.html">writeup →</a>
-        </div>
-      </article>
+    <section class="proj-group" aria-labelledby="proj-tools">
+      <h3 class="proj-group-head" id="proj-tools"><span class="prompt-inline">~/projects/</span>tools</h3>
+      <p class="proj-group-sub">Security and automation tooling I've built from scratch.</p>
+      <div class="card-grid">
 
-      <article class="card">
-        <h3>Network Forensics & Active Directory</h3>
-        <p data-content="projects.project2"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Active Directory</li><li>Kerberos</li><li>BloodHound</li><li>Wireshark</li><li>NetExec</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-          <a href="writeups/layover.html">writeup →</a>
-        </div>
-      </article>
+        <article class="card">
+          <div class="card-top">
+            <h3>Vuln-Scanner</h3>
+            <span class="card-status status-wip">v0.1 · in dev</span>
+          </div>
+          <p data-content="projects.vulnScanner"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Python</li><li>NVD API</li><li>CPE/CVE</li><li>SQLite</li><li>Rich</li><li>Recon</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/BustaYaga/vuln-scanner" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
 
-      <article class="card">
-        <h3>Cloud SIEM & Threat Detection</h3>
-        <p data-content="projects.project3"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Microsoft Azure</li><li>Microsoft Sentinel</li><li>KQL</li><li>MITRE ATT&CK</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-        </div>
-      </article>
+        <article class="card">
+          <div class="card-top">
+            <h3>CSFloat Dip Scanner</h3>
+            <span class="card-status status-live">automated</span>
+          </div>
+          <p data-content="projects.csfloater"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Python</li><li>Flask</li><li>REST APIs</li><li>SQLite</li><li>GitHub Actions</li><li>Cron</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/BustaYaga/csfloater" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
 
-      <article class="card">
-        <h3>Enterprise Integration & Web Debugging</h3>
-        <p data-content="projects.project4"></p>
-        <ul class="tag-list tag-list-sm">
-          <li>Node.js</li><li>Django</li><li>Docker</li><li>API Security</li><li>Linux</li>
-        </ul>
-        <div class="card-links">
-          <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
-        </div>
-      </article>
+      </div>
+    </section>
 
-    </div>
+    <section class="proj-group" aria-labelledby="proj-homelabs">
+      <h3 class="proj-group-head" id="proj-homelabs"><span class="prompt-inline">~/projects/</span>homelabs</h3>
+      <p class="proj-group-sub">Detection engineering and SIEM environments I've stood up and operated.</p>
+      <div class="card-grid">
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Cloud SIEM &amp; Threat Detection</h3>
+          </div>
+          <p data-content="projects.project3"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Microsoft Azure</li><li>Microsoft Sentinel</li><li>KQL</li><li>MITRE ATT&amp;CK</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <h3>SIEM &amp; SOC Toolkit</h3>
+          </div>
+          <p data-content="projects.siemToolkit"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Sentinel</li><li>KQL</li><li>Log Triage</li><li>IOC Hunting</li><li>Wireshark</li><li>MITRE ATT&amp;CK</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="proj-group" aria-labelledby="proj-labs">
+      <h3 class="proj-group-head" id="proj-labs"><span class="prompt-inline">~/projects/</span>offensive-labs</h3>
+      <p class="proj-group-sub">Hands-on exploitation, Active Directory and application security work.</p>
+      <div class="card-grid">
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Web App Exploitation &amp; PrivEsc</h3>
+          </div>
+          <p data-content="projects.project1"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Python</li><li>Next.js</li><li>Burp Suite</li><li>Docker</li><li>PrivEsc</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+            <a href="writeups/reactor.html">writeup →</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Network Forensics &amp; Active Directory</h3>
+          </div>
+          <p data-content="projects.project2"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Active Directory</li><li>Kerberos</li><li>BloodHound</li><li>Wireshark</li><li>NetExec</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+            <a href="writeups/layover.html">writeup →</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <h3>Enterprise Integration &amp; Web Debugging</h3>
+          </div>
+          <p data-content="projects.project4"></p>
+          <ul class="tag-list tag-list-sm">
+            <li>Node.js</li><li>Django</li><li>Docker</li><li>API Security</li><li>Linux</li>
+          </ul>
+          <div class="card-links">
+            <a href="https://github.com/bustayaga" target="_blank" rel="noopener">source →</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
   </div>
 
   <div class="panel" id="panel-certs" hidden>
