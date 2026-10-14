@@ -11,6 +11,7 @@ import { Greeting } from './modules/greeting.js';
 import { NameGlitch } from './modules/glitch.js';
 import { CsMode } from './modules/csmode.js';
 import { Theme } from './modules/theme.js';
+import { Reveal } from './modules/reveal.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
 import { CHOICE_KEY } from './modules/config.js';
@@ -36,6 +37,7 @@ export class PortfolioApp {
     this.navigation = new Navigation({ modeManager: this.modes, terminal: this.terminal });
     this.greeting = new Greeting();
     this.theme = new Theme();
+    this.reveal = new Reveal();
     this.nameGlitch = new NameGlitch();
     this.csMode = new CsMode({
       feeds: { dedsec: this.dedsecFeed, threat: this.threatFeed },
@@ -76,6 +78,7 @@ export class PortfolioApp {
     // this.greeting.init();
 
     this.nameGlitch.init();
+    this.reveal.init();
     this.watchRecruiterGlitch();
 
     this.setupIntroGate();
@@ -85,7 +88,10 @@ export class PortfolioApp {
   // (and again is a no-op, since the glitch is idempotent and one-shot).
   watchRecruiterGlitch() {
     const startIfRecruiter = () => {
-      if (document.body.dataset.terminal === 'off') this.nameGlitch.start();
+      if (document.body.dataset.terminal === 'off') {
+        this.nameGlitch.start();
+        this.reveal.start();
+      }
     };
     startIfRecruiter();
     const observer = new MutationObserver(startIfRecruiter);
