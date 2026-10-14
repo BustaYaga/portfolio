@@ -103,49 +103,88 @@ export class PortfolioApp {
     observer.observe(document.body, { attributes: true, attributeFilter: ['data-terminal'] });
   }
 
-  // Typewrite "Hi, I'm Anmol Chaudhary", then fade in the rest of the hero and
-  // arm the section typewriters.
+  // Fade-IN only, staged: everything starts hidden; reveal the title (typed),
+  // then the description, then resume/contact, then the facts, then the
+  // sections — each step waiting for the previous one to settle.
   async enterRecruiter() {
     const inner = document.querySelector('.rv-hero-inner');
+    if (!inner) return;
     const greet = document.getElementById('greetWord');
+    const mid = document.getElementById('greetMid');
     const name = document.getElementById('heroName');
+    const status = inner.querySelector('.rv-status');
+    const role = inner.querySelector('.rv-role');
+    const pitch = inner.querySelector('.rv-pitch');
+    const cta = inner.querySelector('.rv-cta');
+    const facts = inner.querySelector('.rv-facts');
+    const parts = [status, role, pitch, cta, facts];
 
-    const finish = () => {
-      this.nameGlitch.start();
-      this.sections.armRecruiter();
-    };
+    const reveal = (el) => el && el.classList.add('rv-in');
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const finish = () => { this.nameGlitch.start(); this.sections.armRecruiter(); };
 
-    if (!inner || !greet || !name || Config.prefersReducedMotion()) {
+    // reset to the hidden resting state with transitions off, so re-entering
+    // recruiter mode never produces a fade-OUT (fade-in only).
+    inner.classList.add('no-anim');
+    parts.forEach((el) => el && el.classList.remove('rv-in'));
+    void inner.offsetWidth; // flush the instant reset
+    inner.classList.remove('no-anim');
+
+    if (greet) greet.textContent = '';
+    if (mid) mid.textContent = '';
+    if (name) { name.textContent = ''; name.setAttribute('data-text', ''); }
+
+    if (Config.prefersReducedMotion()) {
       if (greet) greet.textContent = 'Hi';
+      if (mid) mid.textContent = ", I'm ";
       if (name) { name.textContent = 'Anmol Chaudhary'; name.setAttribute('data-text', 'Anmol Chaudhary'); }
-      if (inner) inner.classList.add('hero-in');
+      parts.forEach(reveal);
       finish();
       return;
     }
 
-    inner.classList.remove('hero-in');
-    inner.classList.add('hero-intro');
-    greet.textContent = '';
-    name.textContent = '';
-    name.setAttribute('data-text', '');
+    const STEP = 620; // pause between fade-in stages
 
+    // 1) status badge, then typewriter the hero title
+    reveal(status);
+    await wait(260);
     await this.typeInto(greet, 'Hi');
+    await this.typeInto(mid, ", I'm ");
     await this.typeInto(name, 'Anmol Chaudhary');
-    name.setAttribute('data-text', 'Anmol Chaudhary');
+    if (name) name.setAttribute('data-text', 'Anmol Chaudhary');
 
-    inner.classList.remove('hero-intro');
-    inner.classList.add('hero-in');
+    // 2) role subtitle + description
+    reveal(role);
+    await wait(380);
+    reveal(pitch);
+    await wait(STEP);
+
+    // 3) resume / email / contact
+    reveal(cta);
+    await wait(STEP);
+
+    // 4) looking-for / based-in / notice-period
+    reveal(facts);
+    await wait(STEP);
+
+    // 5) capabilities and the rest (typewriter heading + body fade)
     finish();
   }
 
-  typeInto(el, text, speed = 55) {
+  typeInto(el, text, speed = 58) {
     return new Promise((resolve) => {
+      if (!el) { resolve(); return; }
+      el.classList.add('tw-caret');
       let i = 0;
       const step = () => {
         i += 1;
         el.textContent = text.slice(0, i);
-        if (i < text.length) setTimeout(step, speed + Math.random() * 25);
-        else resolve();
+        if (i < text.length) {
+          setTimeout(step, speed + Math.random() * 28);
+        } else {
+          el.classList.remove('tw-caret');
+          resolve();
+        }
       };
       step();
     });
