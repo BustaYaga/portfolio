@@ -40,7 +40,15 @@ export class PortfolioApp {
     this.githubActivity.init();
     this.certs.init();
 
-    this.terminal.onPanelRequested = (panel) => this.modes.showPanel(panel);
+    // Reveal the requested panel and bring it into view, so typed terminal
+    // commands navigate the same way the navbar links do.
+    this.terminal.onPanelRequested = (panel) => {
+      if (!this.modes.showPanel(panel)) return;
+      const viewport = document.getElementById('viewport');
+      if (viewport) {
+        viewport.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
     this.terminal.onRecruiterRequested = () => this.modes.toggleRecruiterMode();
     this.terminal.init();
 
