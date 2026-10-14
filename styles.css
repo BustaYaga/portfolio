@@ -1393,3 +1393,53 @@ body[data-terminal="off"] #panel-skills { display: none !important; }
   .rv-greet { transition: none; }
   .rv-btn:hover { transform: none; }
 }
+
+/* ---- hero name glitch (recruiter view) ---- */
+.rv-name { position: relative; display: inline-block; }
+.rv-name--typing { border-right: 2px solid var(--accent); animation: rv-caret 0.7s steps(1) infinite; }
+@keyframes rv-caret { 50% { border-right-color: transparent; } }
+
+.rv-name--glitch { animation: rv-skew 0.4s steps(3, end) infinite; }
+.rv-name--glitch::before,
+.rv-name--glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.rv-name--glitch::before {
+  color: var(--cyber-cyan);
+  animation: rv-glitch-1 0.5s steps(2, end) infinite;
+}
+.rv-name--glitch::after {
+  color: var(--danger);
+  animation: rv-glitch-2 0.46s steps(2, end) infinite;
+}
+@keyframes rv-skew {
+  0% { transform: skewX(0deg); }
+  33% { transform: skewX(1.8deg); }
+  66% { transform: skewX(-1.4deg); }
+  100% { transform: skewX(0deg); }
+}
+@keyframes rv-glitch-1 {
+  0%   { clip-path: inset(0 0 82% 0);  transform: translate(-2px, -1px); }
+  20%  { clip-path: inset(38% 0 40% 0); transform: translate(2px, 1px); }
+  40%  { clip-path: inset(68% 0 10% 0); transform: translate(-1px, 0); }
+  60%  { clip-path: inset(18% 0 58% 0); transform: translate(2px, -1px); }
+  80%  { clip-path: inset(52% 0 22% 0); transform: translate(-2px, 1px); }
+  100% { clip-path: inset(8% 0 76% 0);  transform: translate(1px, 0); }
+}
+@keyframes rv-glitch-2 {
+  0%   { clip-path: inset(72% 0 8% 0);  transform: translate(2px, 1px); }
+  20%  { clip-path: inset(12% 0 66% 0); transform: translate(-2px, -1px); }
+  40%  { clip-path: inset(46% 0 30% 0); transform: translate(1px, 1px); }
+  60%  { clip-path: inset(80% 0 4% 0);  transform: translate(-2px, 0); }
+  80%  { clip-path: inset(24% 0 54% 0); transform: translate(2px, -1px); }
+  100% { clip-path: inset(60% 0 20% 0); transform: translate(-1px, 1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-name--glitch { animation: none; }
+  .rv-name--glitch::before, .rv-name--glitch::after { display: none; }
+  .rv-name--typing { animation: none; border-right-color: transparent; }
+}
