@@ -156,11 +156,14 @@ export class CsMode {
     window.addEventListener('mousemove', this._mouse);
 
     if (prefersReducedMotion()) {
-      // single static frame
+      // single static frame, no crosshair — keep the OS cursor visible
       ctx.fillStyle = 'rgba(10,9,7,1)';
       ctx.fillRect(0, 0, w, h);
       return;
     }
+
+    // crosshair replaces the OS cursor
+    document.body.classList.add('cs-nocursor');
 
     const draw = () => {
       ctx.fillStyle = 'rgba(10, 9, 7, 0.35)';
@@ -323,7 +326,7 @@ export class CsMode {
     const ghStatus = document.getElementById('ghActivityStatus');
     if (ghStatus) ghStatus.style.display = '';
 
-    document.body.classList.remove('cs-mode');
+    document.body.classList.remove('cs-mode', 'cs-nocursor');
 
     // restore live widgets
     if (this.feeds.dedsec && this.feeds.dedsec.body) this.feeds.dedsec.body.innerHTML = '';
