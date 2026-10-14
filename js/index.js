@@ -11,7 +11,8 @@ import { Greeting } from './modules/greeting.js';
 import { NameGlitch } from './modules/glitch.js';
 import { CsMode } from './modules/csmode.js';
 import { Theme } from './modules/theme.js';
-import { Reveal } from './modules/reveal.js';
+import { Sections } from './modules/sections.js';
+import { Blob } from './modules/blob.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
 import { CHOICE_KEY } from './modules/config.js';
@@ -37,7 +38,8 @@ export class PortfolioApp {
     this.navigation = new Navigation({ modeManager: this.modes, terminal: this.terminal });
     this.greeting = new Greeting();
     this.theme = new Theme();
-    this.reveal = new Reveal();
+    this.sections = new Sections();
+    this.blob = new Blob();
     this.nameGlitch = new NameGlitch();
     this.csMode = new CsMode({
       feeds: { dedsec: this.dedsecFeed, threat: this.threatFeed },
@@ -59,6 +61,8 @@ export class PortfolioApp {
     // commands navigate the same way the navbar links do.
     this.terminal.onPanelRequested = (panel) => {
       if (!this.modes.showPanel(panel)) return;
+      // Typewriter the heading + fade the body when a panel opens.
+      this.sections.playNow(document.getElementById(`panel-${panel}`));
       const viewport = document.getElementById('viewport');
       if (viewport) {
         viewport.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -66,6 +70,10 @@ export class PortfolioApp {
     };
     this.terminal.onRecruiterRequested = () => this.modes.toggleRecruiterMode();
     this.terminal.onCsRequested = () => this.csMode.toggle();
+    this.terminal.onThemeRequested = (mode) => {
+      const next = mode || (this.theme.current === 'light' ? 'dark' : 'light');
+      this.theme.switchTo(next);
+    };
     this.terminal.init();
 
     this.modes.init();
@@ -78,24 +86,81 @@ export class PortfolioApp {
     // this.greeting.init();
 
     this.nameGlitch.init();
-    this.reveal.init();
-    this.watchRecruiterGlitch();
+    this.sections.init();
+    this.blob.init();
+    this.watchRecruiter();
 
     this.setupIntroGate();
   }
 
-  // Start the hero name glitch once the recruiter view is actually visible
-  // (and again is a no-op, since the glitch is idempotent and one-shot).
-  watchRecruiterGlitch() {
-    const startIfRecruiter = () => {
-      if (document.body.dataset.terminal === 'off') {
-        this.nameGlitch.start();
-        this.reveal.start();
-      }
+  // Run the recruiter entry sequence whenever the recruiter view becomes active.
+  watchRecruiter() {
+    const enterIfRecruiter = () => {
+      if (document.body.dataset.terminal === 'off') this.enterRecruiter();
     };
-    startIfRecruiter();
-    const observer = new MutationObserver(startIfRecruiter);
+    enterIfRecruiter();
+    const observer = new MutationObserver(enterIfRecruiter);
     observer.observe(document.body, { attributes: true, attributeFilter: ['data-terminal'] });
+  }
+
+  // Typewrite "Hi, I'm Anmol Chaudhary", then fade in the rest of the hero and
+  // arm the section typewriters.
+  async enterRecruiter() {
+    const inner = document.querySelector('.rv-hero-inner');
+    const greet = document.getElementById('greetWord');
+    const name = document.getElementById('heroName');
+
+    const finish = () => {
+      this.nameGlitch.start();
+      this.sections.armRecruiter();
+    };
+
+    if (!inner || !greet || !name || Config.prefersReducedMotion()) {
+      if (greet) greet.textContent = 'Hi';
+      if (name) { name.textContent = 'Anmol Chaudhary'; name.setAttribute('data-text', 'Anmol Chaudhary'); }
+      if (inner) inner.classList.add('hero-in');
+      finish();
+      return;
+    }
+
+    inner.classList.remove('hero-in');
+    inner.classList.add('hero-intro');
+    greet.textContent = '';
+    name.textContent = '';
+    name.setAttribute('data-text', '');
+
+    await this.typeInto(greet, 'Hi');
+    await this.typeInto(name, 'Anmol Chaudhary');
+    name.setAttribute('data-text', 'Anmol Chaudhary');
+
+    inner.classList.remove('hero-intro');
+    inner.classList.add('hero-in');
+    finish();
+  }
+
+  typeInto(el, text, speed = 55) {
+    return new Promise((resolve) => {
+      let i = 0;
+      const step = () => {
+        i += 1;
+        el.textContent = text.slice(0, i);
+        if (i < text.length) setTimeout(step, speed + Math.random() * 25);
+        else resolve();
+      };
+      step();
+    });
+  }
+
+  // One-time pop-in for the ambient .log feeds when the terminal first starts.
+  popFeeds() {
+    if (this._feedsPopped) return;
+    this._feedsPopped = true;
+    ['dedsec-feed', 'threat-feed'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('feed-pop');
+      setTimeout(() => el.classList.remove('feed-pop'), 750);
+    });
   }
 
   // First-time visitors pick a view (recruiter vs technical) at the intro gate.
@@ -113,7 +178,10 @@ export class PortfolioApp {
 
     // Boot the shell only when the terminal view is already the active one.
     const bootIfTerminal = () => {
-      if (this.modes.currentMode === 'on') this.terminal.typeBoot();
+      if (this.modes.currentMode === 'on') {
+        this.terminal.typeBoot();
+        this.popFeeds();
+      }
     };
 
     // No gate in the DOM, or the visitor already chose: behave as before.
@@ -144,6 +212,7 @@ export class PortfolioApp {
         this.modes.setRecruiterMode(0);
         this.terminal.typeBoot();
         this.terminal.focus();
+        this.popFeeds();
       }
     };
 

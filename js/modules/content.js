@@ -46,7 +46,7 @@ export const PORTFOLIO_CONTENT = {
 
   footer: {
     tagline:
-      '&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.',
+      '&copy; <span id="year"></span> Anmol Chaudhary',
   },
 
   // Ambient Threat Feed initial seed lines
