@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Touch — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Touch</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-windows">Windows</span>
+    <span class="diff-tag diff-easy">Easy</span>
+    <span class="wu-date">Pwned: 2026-10-04</span>
+  </div>
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Touch</td></tr>
+  <tr><td>OS</td><td>Windows</td></tr>
+  <tr><td>Difficulty</td><td>Easy</td></tr>
+  <tr><td>Status</td><td>User</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Tools Used</h2>
+  <div class="table-wrap"><table><thead><tr><th>Tool</th><th>Purpose</th></tr></thead><tbody>
+  <tr><td>nmap</td><td>Port &amp; service enumeration</td></tr>
+  <tr><td>ffuf</td><td>Directory / endpoint fuzzing of the DeviceHub web app</td></tr>
+  <tr><td>curl</td><td>Reading the leaked /api/status metadata</td></tr>
+  <tr><td>xfreerdp</td><td>RDP access to the kiosk desktop</td></tr>
+  <tr><td>Internet Explorer / file:// URI</td><td>Kiosk breakout to a command prompt</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Summary</h2>
+  <p>Touch is an Easy Windows machine, themed like the earlier Layover box: access is over RDP into a locked-down kiosk environment. A "DeviceHub" scanner web app on port 8443 leaks device metadata at <code>/api/status</code>, including a hardware serial that doubles as the login secret. Authenticating to the web app exposes plaintext RDP credentials for <code>KioskUser</code>. From the kiosk desktop — a constrained plane-ticket booking app — the attached scanner can be powered off through the same web app, forcing the kiosk into an error state with a clickable redirect that opens Internet Explorer. A <code>file://</code> URI to <code>cmd.exe</code> then breaks out of the kiosk into a command prompt, where the user flag is read.</p>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <pre><code># Nmap 7.991 scan initiated as: nmap -sC -sV -O -A -oN scan.txt touch.htb
+PORT     STATE SERVICE        VERSION
+135/tcp  open  msrpc?
+3389/tcp open  ms-wbt-server?
+5985/tcp open  http           Microsoft HTTPAPI httpd 2.0 (WinRM)
+8443/tcp open  http           Microsoft HTTPAPI httpd 2.0
+|_http-cors: GET POST PUT OPTIONS
+|_http-title: Did not follow redirect to /login
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows</code></pre>
+  <p><strong>Open Ports:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>3389</td><td>ms-wbt-server (RDP)</td><td>Kiosk desktop; entered later with recovered credentials.</td></tr>
+  <tr><td>5985</td><td>WinRM</td><td>Microsoft HTTPAPI.</td></tr>
+  <tr><td>8443</td><td>http (DeviceHub)</td><td>Scanner web app; redirects to /login and exposes /api/status.</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <h3>Vulnerabilities Identified</h3>
+  <div class="table-wrap"><table><thead><tr><th>Vulnerability</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>Metadata / secret disclosure</td><td>Unauthenticated /api/status returns the device serial, which is accepted as the DeviceHub login secret.</td><td>High</td></tr>
+  <tr><td>Plaintext credential storage</td><td>The authenticated DeviceHub app discloses RDP credentials for KioskUser in clear text.</td><td>High</td></tr>
+  <tr><td>Kiosk breakout (file:// URI)</td><td>An error-state redirect opens Internet Explorer, which can browse file:// paths to launch cmd.exe outside the kiosk.</td><td>High</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Initial Access</h2>
+  <h4>Leaked Device Serial</h4>
+  <p>Fuzzing the DeviceHub app with ffuf surfaces an <code>/api/status</code> endpoint that returns device metadata without authentication — including the hardware serial:</p>
+  <pre><code>curl -i http://touch.htb:8443/api/status
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+
+{"device":"Nexion DeviceHub DH-100","serial":"NX-DH-2024-B7042","firmware":"1.4.2","status":"online","uptime":77142}</code></pre>
+  <p>The serial <code>NX-DH-2024-B7042</code> is accepted as the DeviceHub login secret. Once authenticated, the app displays the RDP credentials for the kiosk account in plaintext:</p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Service</th></tr></thead><tbody>
+  <tr><td>DeviceHub login</td><td>NX-DH-2024-B7042 (device serial)</td><td>DeviceHub web app (8443)</td></tr>
+  <tr><td>KioskUser</td><td>K!0sk2026#</td><td>RDP kiosk desktop</td></tr>
+  </tbody></table></div>
+  <h4>RDP into the Kiosk</h4>
+  <p>Connecting over RDP with <code>xfreerdp</code> lands on a locked-down plane-ticket booking kiosk, using the KioskUser credentials recovered above.</p>
+  <pre><code>xfreerdp /v:touch.htb /u:KioskUser /p:'K!0sk2026#' /cert:ignore</code></pre>
+  <hr>
+  <h2>Kiosk Breakout → User</h2>
+  <p>The kiosk is tied to an attached scanner. Powering the scanner off from the DeviceHub web app (already authenticated earlier) forces the kiosk app into an error state, which renders a clickable redirect link. Following that link opens Internet Explorer inside the otherwise locked session.</p>
+  <p>With a browser available, an <code>file://</code> URI pointing at <code>cmd.exe</code> escapes the kiosk and spawns a command prompt:</p>
+  <pre><code>file:///C:/Windows/System32/cmd.exe</code></pre>
+  <p>From the command prompt the user flag is accessible:</p>
+  <pre><code>type C:\Users\KioskUser\Desktop\user.txt
+---CENSORED---</code></pre>
+  <p>If a more comfortable shell is needed, a standard PowerShell reverse shell one-liner can be launched from the same prompt to a netcat listener.</p>
+  <hr>
+  <h2>Notes</h2>
+  <p>This writeup documents the chain from the leaked serial through the kiosk breakout to the user flag. The root portion is not covered here.</p>
+  <hr>
+  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script type="module" src="../js/modules/writeup.js"></script>
+</body>
+</html>

