@@ -40,12 +40,14 @@ const SKINS = [
 ];
 
 const STATS = [
-  { label: 'Players online', min: 820000, max: 1420000 },
-  { label: 'Servers online', min: 52000, max: 118000 },
-  { label: 'Active matches', min: 38000, max: 96000 },
-  { label: 'Accounts VAC-banned (24h)', min: 4000, max: 21000 },
-  { label: 'Cases opened (24h)', min: 2100000, max: 7400000 },
-  { label: 'Chickens fed', min: 90000, max: 650000 },
+  // 'range' values drift dynamically within [min, max]
+  { label: 'Players online', type: 'range', min: 820000, max: 1420000 },
+  { label: 'Servers online', type: 'range', min: 200000, max: 210000 },
+  { label: 'Active matches', type: 'range', min: 180000, max: 200000 },
+  // 'counter' values only ever tick upward, by 1–5 at random intervals
+  { label: 'Accounts VAC-banned (24h)', type: 'counter', start: 12000 },
+  { label: 'Cases opened (24h)', type: 'counter', start: 3400000 },
+  { label: 'Chickens fed', type: 'counter', start: 420000 },
 ];
 
 const DROPS = [
@@ -258,19 +260,45 @@ export class CsMode {
     const sysTitle = document.querySelector('#sysMonitorCard .widget-card-title');
     if (sysTitle) { this.origTitles.sys = sysTitle.textContent; sysTitle.textContent = 'cs2-stats.live'; }
     if (sys) {
+      // seed current values
+      this.statState = STATS.map((s) =>
+        s.type === 'counter' ? s.start : rand(s.min, s.max)
+      );
       sys.innerHTML = STATS.map((s, i) =>
         `<div class="cs-stat"><span class="cs-stat-label">${s.label}</span>` +
-        `<span class="cs-stat-val" id="csstat-${i}">${fmt(rand(s.min, s.max))}</span></div>`
+        `<span class="cs-stat-val" id="csstat-${i}">${fmt(this.statState[i])}</span></div>`
       ).join('');
-      const tick = () => {
+
+      const setVal = (i) => {
+        const el = document.getElementById(`csstat-${i}`);
+        if (el) el.textContent = fmt(this.statState[i]);
+      };
+
+      // range stats drift gently within their band for a live feel
+      const fluctuate = () => {
         if (!this.active) return;
         STATS.forEach((s, i) => {
-          const el = document.getElementById(`csstat-${i}`);
-          if (el) el.textContent = fmt(rand(s.min, s.max));
+          if (s.type !== 'range') return;
+          const span = s.max - s.min;
+          const delta = Math.round((Math.random() - 0.5) * span * 0.08);
+          this.statState[i] = Math.min(s.max, Math.max(s.min, this.statState[i] + delta));
+          setVal(i);
         });
-        this.track(tick, 1500);
+        this.track(fluctuate, rand(1200, 2200));
       };
-      this.track(tick, 1500);
+      this.track(fluctuate, 1200);
+
+      // counters only increase: +1..5 on each stat's own random interval
+      STATS.forEach((s, i) => {
+        if (s.type !== 'counter') return;
+        const bump = () => {
+          if (!this.active) return;
+          this.statState[i] += rand(1, 6); // 1..5
+          setVal(i);
+          this.track(bump, rand(700, 3000));
+        };
+        this.track(bump, rand(700, 3000));
+      });
     }
 
     // git log -> match / drop feed
