@@ -1564,31 +1564,46 @@ body.cs-mode .footer { position: relative; z-index: 1; }
   opacity: 1;
   transform: none;
 }
+.tw-section.tw-noanim > :not(.section-head):not(.rv-head) { transition: none !important; }
 
-/* ---- recruiter hero entry sequence ---- */
+/* ---- recruiter hero entry: fade-IN only, staged ---- */
+/* every hero part starts hidden; JS reveals them one at a time with .rv-in */
 .rv-hero-inner .rv-status,
 .rv-hero-inner .rv-role,
 .rv-hero-inner .rv-pitch,
 .rv-hero-inner .rv-cta,
 .rv-hero-inner .rv-facts {
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.rv-hero-inner.hero-intro .rv-status,
-.rv-hero-inner.hero-intro .rv-role,
-.rv-hero-inner.hero-intro .rv-pitch,
-.rv-hero-inner.hero-intro .rv-cta,
-.rv-hero-inner.hero-intro .rv-facts {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(14px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
 }
-.rv-hero-inner.hero-intro .rv-role { transition-delay: 0.05s; }
-.rv-hero-inner.hero-intro .rv-pitch { transition-delay: 0.1s; }
-.rv-hero-inner.hero-intro .rv-cta { transition-delay: 0.15s; }
-.rv-hero-inner.hero-intro .rv-facts { transition-delay: 0.2s; }
-/* the greeting caret while the hero name types */
-.rv-hero-inner.hero-intro #heroName::after {
-  content: "▋"; color: var(--accent); margin-left: 2px;
+.rv-hero-inner .rv-status.rv-in,
+.rv-hero-inner .rv-role.rv-in,
+.rv-hero-inner .rv-pitch.rv-in,
+.rv-hero-inner .rv-cta.rv-in,
+.rv-hero-inner .rv-facts.rv-in {
+  opacity: 1;
+  transform: none;
+}
+/* instant reset (no fade-out) when re-entering recruiter mode */
+.rv-hero-inner.no-anim .rv-status,
+.rv-hero-inner.no-anim .rv-role,
+.rv-hero-inner.no-anim .rv-pitch,
+.rv-hero-inner.no-anim .rv-cta,
+.rv-hero-inner.no-anim .rv-facts { transition: none !important; }
+
+/* typewriter caret on whichever span is being typed */
+.tw-caret::after {
+  content: "▋"; color: var(--accent); margin-left: 1px;
   animation: blink 1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-hero-inner .rv-status,
+  .rv-hero-inner .rv-role,
+  .rv-hero-inner .rv-pitch,
+  .rv-hero-inner .rv-cta,
+  .rv-hero-inner .rv-facts { opacity: 1 !important; transform: none !important; transition: none; }
+  .tw-caret::after { content: none; }
 }
 
 /* ---- one-time pop-in for the ambient .log feeds on terminal start ---- */

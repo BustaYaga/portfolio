@@ -58,10 +58,16 @@ export class Sections {
     if (tw) tw.textContent = '';
   }
 
-  // Recruiter mode: reset every section and let the observer play them on scroll.
+  // Recruiter mode: reset every section (instantly, so no fade-out on
+  // re-entry) and let the observer play them on scroll.
   armRecruiter() {
     const sections = document.querySelectorAll('.tw-section');
-    sections.forEach((s) => this.reset(s));
+    sections.forEach((s) => {
+      s.classList.add('tw-noanim');
+      this.reset(s);
+      void s.offsetWidth;
+      s.classList.remove('tw-noanim');
+    });
     if (!this.observer) {
       sections.forEach((s) => this.play(s));
       return;
