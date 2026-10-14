@@ -7,6 +7,7 @@ import { DedsecFeed } from './modules/dedsec-feed.js';
 import { Terminal } from './modules/terminal.js';
 import { ModeManager } from './modules/modes.js';
 import { Navigation } from './modules/navigation.js';
+import { Greeting } from './modules/greeting.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
 import { CHOICE_KEY } from './modules/config.js';
@@ -30,6 +31,7 @@ export class PortfolioApp {
       sysMonitor: this.sysMonitor,
     });
     this.navigation = new Navigation({ modeManager: this.modes, terminal: this.terminal });
+    this.greeting = new Greeting();
   }
 
   init() {
@@ -55,6 +57,7 @@ export class PortfolioApp {
 
     this.modes.init();
     this.navigation.init();
+    this.greeting.init();
 
     this.setupIntroGate();
   }

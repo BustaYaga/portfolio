@@ -113,12 +113,8 @@ export class ModeManager {
       this.showAllPanels();
 
       if (!options.isInitial) {
-        const recruiterPanel = document.getElementById('panel-recruiter');
-        if (recruiterPanel) {
-          recruiterPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (this.viewportEl) {
-          this.viewportEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        // Recruiter view replaces the old text panel; land at the top of it.
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } else {
       this.showPanel('dashboard');
