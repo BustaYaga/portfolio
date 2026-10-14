@@ -165,6 +165,16 @@ export class CsMode {
     // crosshair replaces the OS cursor
     document.body.classList.add('cs-nocursor');
 
+    // Hyprland-style emergence: the CS background grows from the centre as an
+    // expanding circle until it covers the viewport.
+    if (canvas.animate) {
+      const endRadius = Math.hypot(w, h) / 2;
+      canvas.animate(
+        { clipPath: [`circle(0px at 50% 50%)`, `circle(${endRadius}px at 50% 50%)`] },
+        { duration: 700, easing: 'ease-out' }
+      );
+    }
+
     const draw = () => {
       ctx.fillStyle = 'rgba(10, 9, 7, 0.35)';
       ctx.fillRect(0, 0, w, h);

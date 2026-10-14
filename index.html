@@ -18,6 +18,13 @@
       document.documentElement.setAttribute('data-gate', 'hidden');
     }
   } catch (e) {}
+  // Apply saved theme before first paint (no flash). Default: dark.
+  try {
+    document.documentElement.setAttribute(
+      'data-theme',
+      localStorage.getItem('portfolio-theme') === 'light' ? 'light' : 'dark'
+    );
+  } catch (e) {}
 </script>
 </head>
 <body>
@@ -64,6 +71,10 @@
       <!-- <a href="#" data-cmd="recruiter" class="nav-recruiter">recruiter mode</a> -->
     </nav>
     <div class="nav-controls">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light / dark theme">
+        <svg class="theme-ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+      </button>
       <button class="recruiter-toggle" id="recruiterToggle" role="switch" aria-checked="false" aria-label="Toggle recruiter mode">
         <span class="recruiter-toggle-label">recruiter mode</span>
         <span class="recruiter-toggle-track"><span class="recruiter-toggle-knob"></span></span>

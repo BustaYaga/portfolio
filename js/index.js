@@ -10,6 +10,7 @@ import { Navigation } from './modules/navigation.js';
 import { Greeting } from './modules/greeting.js';
 import { NameGlitch } from './modules/glitch.js';
 import { CsMode } from './modules/csmode.js';
+import { Theme } from './modules/theme.js';
 import { PORTFOLIO_CONTENT, applyContent, CERTIFICATIONS } from './modules/content.js';
 import * as Config from './modules/config.js';
 import { CHOICE_KEY } from './modules/config.js';
@@ -34,6 +35,7 @@ export class PortfolioApp {
     });
     this.navigation = new Navigation({ modeManager: this.modes, terminal: this.terminal });
     this.greeting = new Greeting();
+    this.theme = new Theme();
     this.nameGlitch = new NameGlitch();
     this.csMode = new CsMode({
       feeds: { dedsec: this.dedsecFeed, threat: this.threatFeed },
@@ -66,6 +68,7 @@ export class PortfolioApp {
 
     this.modes.init();
     this.navigation.init();
+    this.theme.init();
 
     // Rotating hero greeting (Hi / Hello / Howdy / Hey / Namaste) — kept as a
     // feature but disabled for now; the hero shows a static "Hi". Re-enable by
