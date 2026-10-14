@@ -649,6 +649,32 @@ body[data-terminal="off"] .nav-recruiter {
 .card p { margin: 0; color: var(--text-dim); font-size: 0.9rem; flex-grow: 1; }
 .card-links { display: flex; gap: 16px; font-family: var(--mono); font-size: 0.8rem; }
 
+.proj-group { margin-top: 36px; }
+.proj-group:first-of-type { margin-top: 28px; }
+.proj-group-head {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--text);
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.proj-group-head .prompt-inline { color: var(--text-dim); margin-right: 0; }
+.proj-group-sub { margin: 8px 0 0; color: var(--text-dim); font-size: 0.85rem; }
+.proj-group .card-grid { margin-top: 16px; }
+
+.card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.card-status {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.card-status.status-wip { color: var(--accent); border-color: var(--accent-dim); }
+.card-status.status-live { color: var(--ok); border-color: currentColor; }
+
 /* ===========================================================
    WRITEUPS TABLE
    =========================================================== */
