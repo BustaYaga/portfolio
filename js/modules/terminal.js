@@ -4,7 +4,16 @@
  * fancy cyber initialization sequence, command dispatcher, and history navigation.
  */
 
-import { BOOT_DIAGNOSTICS, ASCII_BANNER, BOOT_LINES, prefersReducedMotion } from './config.js';
+import {
+  BOOT_DIAGNOSTICS,
+  ASCII_BANNER,
+  BOOT_LINES,
+  prefersReducedMotion,
+  SUDO_DENIALS,
+  SUDO_GRANT,
+  SUDO_GRANT_CHANCE,
+  SUDO_HELP_LINES,
+} from './config.js';
 
 export class Terminal {
   constructor(options = {}) {
@@ -13,6 +22,8 @@ export class Terminal {
     this.inputEl = null;
     this.skipBtn = null;
     this.commands = {};
+    this.superuser = false;
+    this.onCsRequested = null;
     this.history = [];
     this.historyIndex = -1;
     this.onCommandExecuted = options.onCommandExecuted || null;
@@ -122,10 +133,38 @@ export class Terminal {
 
     this.registerCommand('clear', () => ({ clear: true }));
 
-    this.registerCommand('sudo', () => ({
-      print: ['guest is not in the sudoers file. this incident will be reported to /var/log/auth.log.'],
-      err: true,
-    }));
+    this.registerCommand('sudo', (args) => this.handleSudo(args));
+  }
+
+  handleSudo(args) {
+    const sub = (args && args[0]) || '';
+    const deny = () => ({ print: [SUDO_DENIALS[Math.floor(Math.random() * SUDO_DENIALS.length)]], err: true });
+
+    // Hidden superuser sub-commands.
+    if (sub === 'help') {
+      return this.superuser ? { print: SUDO_HELP_LINES } : deny();
+    }
+    if (sub === 'cs') {
+      if (!this.superuser) return deny();
+      if (this.onCsRequested) this.onCsRequested();
+      return { print: ['<span class="font-binary">[cs]</span> loading cs2.exe ...'] };
+    }
+    if (sub) {
+      return this.superuser
+        ? { print: [`sudo: ${sub}: command not found`], err: true }
+        : deny();
+    }
+
+    // Bare `sudo`.
+    if (this.superuser) {
+      return { print: ['you are already root. with great power comes `sudo help`.'] };
+    }
+    if (Math.random() < SUDO_GRANT_CHANCE) {
+      this.superuser = true;
+      document.body.dataset.su = '1';
+      return { print: [SUDO_GRANT] };
+    }
+    return deny();
   }
 
   registerCommand(name, handler) {
@@ -214,7 +253,9 @@ export class Terminal {
 
     this.printCommandEcho(cmdText);
 
-    const name = cmdText.toLowerCase().split(/\s+/)[0];
+    const tokens = cmdText.split(/\s+/);
+    const name = tokens[0].toLowerCase();
+    const args = tokens.slice(1).map((a) => a.toLowerCase());
     let handler = this.commands[name];
 
     // Dynamic support for panel ids (e.g. "writeups" -> #panel-writeups)
@@ -234,7 +275,7 @@ export class Terminal {
       return;
     }
 
-    const result = handler();
+    const result = handler(args);
 
     if (result.clear) {
       this.outputEl.innerHTML = '';
