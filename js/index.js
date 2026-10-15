@@ -18,6 +18,7 @@ import * as Config from './modules/config.js';
 import { CHOICE_KEY } from './modules/config.js';
 import { SysMonitor } from './modules/sysmonitor.js';
 import { GithubActivity } from './modules/github-activity.js';
+import { MusicPlayer } from './modules/music.js';
 
 export { ThreatFeed, DedsecFeed, Terminal, ModeManager, Navigation, SysMonitor, GithubActivity, Config, PORTFOLIO_CONTENT as Content, applyContent };
 
@@ -40,6 +41,7 @@ export class PortfolioApp {
     this.theme = new Theme();
     this.sections = new Sections();
     this.blob = new Blob();
+    this.music = new MusicPlayer();
     this.nameGlitch = new NameGlitch();
     this.csMode = new CsMode({
       feeds: { dedsec: this.dedsecFeed, threat: this.threatFeed },
@@ -74,6 +76,10 @@ export class PortfolioApp {
       const next = mode || (this.theme.current === 'light' ? 'dark' : 'light');
       this.theme.switchTo(next);
     };
+    this.terminal.onMusicRequested = () => {
+      if (!this.music.toggleMute()) return null;
+      return this.music.muted;
+    };
     this.terminal.init();
 
     this.modes.init();
@@ -88,6 +94,7 @@ export class PortfolioApp {
     this.nameGlitch.init();
     this.sections.init();
     this.blob.init();
+    this.music.init();
     this.watchRecruiter();
 
     this.setupIntroGate();
