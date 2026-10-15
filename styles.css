@@ -2134,3 +2134,24 @@ body[data-terminal="off"] .rv-node::after {
 .cert-table .cert-row:not(.cert-head):hover,
 .writeup-table a.wt-row:hover { background: var(--tint); }
 .wt-row .tag, .wt-row [class*="diff"], .wt-row [class*="os-"] { border-radius: 0; }
+
+/* ---- dither layering: keep the shadow under a solid fill layer ----
+   A transform (card hover lift, scroll fade-in) turns a box into its own
+   stacking context, which paints a z-index:-1 shadow above the box's own
+   background. Pinning the shadow at -2 under a -1 fill keeps it behind the
+   box either way. */
+.card::after,
+.widget-card::after,
+.rv-cap::after,
+.pixel-callout::after { z-index: -2; }
+.card::before,
+.widget-card::before,
+.rv-cap::before,
+.pixel-callout::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: inherit;
+  pointer-events: none;
+}
