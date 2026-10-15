@@ -29,6 +29,7 @@ export class Terminal {
     this.superuser = false;
     this.onCsRequested = null;
     this.onThemeRequested = null;
+    this.onMusicRequested = null;
     this.history = [];
     this.historyIndex = -1;
     this.onCommandExecuted = options.onCommandExecuted || null;
@@ -68,7 +69,8 @@ export class Terminal {
         '<span class="font-binary">[09]</span> <strong>recruiter</strong>   : toggle recruiter mode (1 <-> 0)',
         '<span class="font-binary">[10]</span> <strong>home</strong>        : back to overview dashboard',
         '<span class="font-binary">[11]</span> <strong>theme</strong>       : toggle light / dark (or <code>theme light</code> / <code>theme dark</code>)',
-        '<span class="font-binary">[12]</span> <strong>clear</strong>       : clear terminal screen',
+        '<span class="font-binary">[12]</span> <strong>music</strong>       : mute / unmute the now-playing track',
+        '<span class="font-binary">[13]</span> <strong>clear</strong>       : clear terminal screen',
       ],
     }));
 
@@ -142,6 +144,12 @@ export class Terminal {
       panel: 'dashboard',
       print: ['system status: operational | 20+ HTB boxes pwned | open to opportunities ↓'],
     }));
+
+    this.registerCommand('music', () => {
+      const muted = this.onMusicRequested ? this.onMusicRequested() : null;
+      if (muted === null) return { print: ['music: track unavailable'] };
+      return { print: [muted ? 'music muted ♪' : 'now playing: Dopamine Hit — ALRT ft. Liam Elliott ♪'] };
+    });
 
     this.registerCommand('clear', () => ({ clear: true }));
 
