@@ -4,19 +4,20 @@
  * artist and a pixel equalizer. The track streams from SoundCloud through its
  * Widget API (a hidden embed), so no audio is hosted here.
  *
- * The player starts MUTED on every visit (the choice is never persisted).
- * Muted means paused, so nothing streams until the visitor unmutes. The embed
- * itself only loads once the visitor reaches for the card (hover, focus,
- * click or the `music` command).
+ * The track plays continuously and on loop; mute only drops the volume to 0,
+ * so unmuting picks up wherever the song has got to. Every visit starts
+ * muted (the choice is never persisted). Browsers block audio from starting
+ * before any user interaction, so if the silent start is refused, playback
+ * begins on the visitor's first click or key press anywhere on the page.
  *
  * The audio lives in a cross-origin iframe, so its signal can't be analysed:
- * the equalizer is a stepped animation that runs only while the track plays.
+ * the equalizer is a stepped animation that runs while the track is audible.
  */
 
 const TRACK_URL = 'https://soundcloud.com/alrtmusic/alrt-ft-liam-elliott-dopamine-hit';
 const API_SRC = 'https://w.soundcloud.com/player/api.js';
 const LOAD_TIMEOUT = 12000; // ms before the card gives up and shows offline
-const PLAY_TIMEOUT = 4000;  // ms to wait for PLAY before reverting to muted
+const VOLUME = 30;          // percent, when unmuted
 const BARS = 5;
 const LEVELS = 6;           // pixel segments per bar
 const EQ_FPS = 9;           // stepped, retro update rate
@@ -29,7 +30,6 @@ export class MusicPlayer {
     this.loading = null;     // promise while the embed loads
     this.muted = true;
     this.playing = false;
-    this.playGuard = 0;
     this.eqTimer = 0;
     this.levels = new Array(BARS).fill(1);
   }
@@ -46,23 +46,44 @@ export class MusicPlayer {
       this.bars.push(bar);
     }
 
-    // warm the embed up as soon as the visitor reaches for the card
-    const warm = () => this.load();
-    this.el.addEventListener('pointerenter', warm, { once: true });
-    this.el.addEventListener('focus', warm, { once: true });
     this.el.addEventListener('click', () => this.toggleMute());
 
-    // Only the terminal view plays; the recruiter view hides and pauses it.
-    new MutationObserver(() => {
-      if (document.body.dataset.terminal === 'off') this.pause();
-      else if (!this.muted) this.play();
-    }).observe(document.body, { attributes: true, attributeFilter: ['data-terminal'] });
+    // If the browser refuses the silent start, begin on the first interaction.
+    const kick = () => {
+      if (this.playing) return;
+      this.start();
+    };
+    ['pointerdown', 'keydown', 'touchstart'].forEach((type) =>
+      document.addEventListener(type, kick, { capture: true, passive: true })
+    );
+    this.stopKick = () => ['pointerdown', 'keydown', 'touchstart'].forEach((type) =>
+      document.removeEventListener(type, kick, { capture: true })
+    );
 
-    this.render();
+    // The track starts once the terminal view is shown and keeps playing from
+    // then on; the recruiter view only hides the card and silences it.
+    const sync = () => {
+      if (!this.inRecruiter) this.start();
+      this.applyVolume();
+      this.render();
+    };
+    new MutationObserver(sync).observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-terminal'],
+    });
+    sync();
   }
 
   get offline() {
     return this.el && this.el.dataset.state === 'offline';
+  }
+
+  get inRecruiter() {
+    return document.body.dataset.terminal === 'off';
+  }
+
+  get audible() {
+    return !this.muted && !this.inRecruiter;
   }
 
   /** Inject the SoundCloud API + a hidden embed once; resolves with the widget. */
@@ -85,13 +106,18 @@ export class MusicPlayer {
         const E = window.SC.Widget.Events;
         widget.bind(E.READY, () => {
           clearTimeout(timer);
-          widget.setVolume(60);
+          this.applyVolume(widget);
           widget.getCurrentSound((sound) => this.setArtwork(sound));
           resolve(widget);
         });
-        widget.bind(E.PLAY, () => { clearTimeout(this.playGuard); this.playing = true; this.render(); });
+        widget.bind(E.PLAY, () => {
+          this.playing = true;
+          this.stopKick();
+          this.applyVolume(); // the embed can reset volume when playback starts
+          this.render();
+        });
         widget.bind(E.PAUSE, () => { this.playing = false; this.render(); });
-        widget.bind(E.FINISH, () => { widget.seekTo(0); if (!this.muted) widget.play(); });
+        widget.bind(E.FINISH, () => { widget.seekTo(0); widget.play(); });
         widget.bind(E.ERROR, () => this.setOffline());
         this.widget = widget;
       };
@@ -108,6 +134,20 @@ export class MusicPlayer {
     return this.loading;
   }
 
+  /** Load the embed if needed and start playback at the current volume. */
+  start() {
+    if (this.offline) return;
+    this.load().then((widget) => {
+      if (this.playing) return;
+      this.applyVolume(widget);
+      widget.play();
+    }, () => {});
+  }
+
+  applyVolume(widget = this.widget) {
+    if (widget) widget.setVolume(this.audible ? VOLUME : 0);
+  }
+
   setArtwork(sound) {
     const url = sound && (sound.artwork_url || (sound.user && sound.user.avatar_url));
     if (!url) return;
@@ -115,35 +155,14 @@ export class MusicPlayer {
     if (art) art.style.backgroundImage = `url("${url.replace('-large', '-t200x200')}")`;
   }
 
-  /** Flip mute. Returns false when the track is unavailable. */
+  /** Flip mute without touching playback. Returns false when unavailable. */
   toggleMute() {
     if (this.offline) return false;
     this.muted = !this.muted;
-    if (this.muted) this.pause();
-    else this.play();
+    this.applyVolume();
+    if (!this.playing) this.start(); // this click/Enter is a user gesture
     this.render();
     return true;
-  }
-
-  play() {
-    if (this.offline || document.body.dataset.terminal === 'off') return;
-    this.load().then((widget) => {
-      if (this.muted) return;
-      widget.play();
-      // if the browser blocks playback no PLAY event arrives — don't claim
-      // we're unmuted when nothing is audible
-      clearTimeout(this.playGuard);
-      this.playGuard = setTimeout(() => {
-        if (!this.playing) { this.muted = true; this.render(); }
-      }, PLAY_TIMEOUT);
-    }, () => {});
-  }
-
-  pause() {
-    clearTimeout(this.playGuard);
-    if (this.widget) this.widget.pause();
-    this.playing = false;
-    this.render();
   }
 
   setOffline() {
@@ -165,7 +184,7 @@ export class MusicPlayer {
     );
 
     clearInterval(this.eqTimer);
-    if (this.muted || !this.playing) {
+    if (!this.audible || !this.playing) {
       this.bars.forEach((b) => b.style.setProperty('--lvl', 1));
       return;
     }
