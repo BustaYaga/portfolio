@@ -1961,3 +1961,176 @@ html[data-theme="light"] { --band: #cf5a14; }
 }
 .card-links a:hover,
 .terminal-body a:hover { color: var(--accent); text-decoration-style: solid; }
+
+/* ===========================================================
+   PIXEL SKIN — recruiter view
+   =========================================================== */
+:root { --hard-shadow: color-mix(in srgb, var(--text-dim) 45%, transparent); }
+html[data-theme="light"] { --hard-shadow: var(--ink); }
+
+/* ---- hero ---- */
+.rv-status {
+  font-family: var(--pixel);
+  font-size: 0.68rem;
+  border-color: var(--ok);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ok) 35%, transparent);
+}
+.rv-status-dot {
+  border-radius: 0;
+  width: 8px; height: 8px;
+  animation: rv-pixel-blink 1.2s steps(1) infinite;
+}
+@keyframes rv-pixel-blink { 50% { opacity: 0.25; } }
+
+.rv-role { font-size: clamp(0.82rem, 1.9vw, 0.96rem); }
+.rv-role .rv-sep { font-family: var(--pixel); }
+
+/* buttons: flat fill + hard offset shadow, press-down on click */
+.rv-btn {
+  border-color: var(--hard-border);
+  background: var(--surface);
+  box-shadow: 3px 3px 0 var(--hard-shadow);
+  transition: transform 0.08s steps(2), box-shadow 0.08s steps(2), color 0.15s ease;
+}
+.rv-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--hard-shadow); }
+.rv-btn:active { transform: translate(3px, 3px); box-shadow: none; }
+.rv-btn-primary { background: var(--accent); color: #140a04; border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+.rv-btn-primary:hover { color: #140a04; }
+.rv-btn-primary:hover { box-shadow: 4px 4px 0 var(--ink); }
+html:not([data-theme="light"]) .rv-btn-primary { border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent-dim); }
+
+/* facts strip → three small fieldset boxes */
+.rv-facts {
+  border-top: none;
+  padding-top: 14px;
+  gap: 18px;
+}
+.rv-facts div {
+  position: relative;
+  border: 1px solid var(--hard-border);
+  padding: 14px 16px 10px;
+  min-width: 180px;
+}
+.rv-facts dt {
+  position: absolute;
+  top: -0.75em; left: 10px;
+  padding: 0 6px;
+  background: var(--bg);
+  font-family: var(--pixel);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+/* ---- section heads ---- */
+.rv-head {
+  font-family: var(--pixel);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  display: flex; align-items: center; gap: 10px;
+}
+.rv-head .rv-prompt {
+  display: inline-grid; place-items: center;
+  width: 22px; height: 22px; margin: 0;
+  background: var(--accent); color: var(--bg);
+  font-size: 0.8rem;
+}
+
+/* ---- capability cards: fieldset legend + pixel icon tile + dither ---- */
+.rv-caps { gap: 30px 22px; margin-top: 30px; }
+.rv-cap {
+  position: relative;
+  background: var(--bg);
+  border-color: var(--hard-border);
+  padding: 26px 20px 20px;
+}
+.rv-cap::after {
+  content: "";
+  position: absolute; z-index: -1;
+  inset: 6px -6px -6px 6px;
+  pointer-events: none;
+  background-image: repeating-conic-gradient(var(--dither) 0 25%, transparent 0 50%);
+  background-size: var(--dither-size) var(--dither-size);
+}
+.rv-cap-top {
+  position: absolute;
+  top: -15px; left: 12px;
+  margin: 0;
+  padding: 0 8px 0 0;
+  gap: 8px;
+  background: var(--bg);
+}
+.rv-cap-ic {
+  width: 28px; height: 28px;
+  padding: 5px;
+  background: currentColor;
+  box-sizing: border-box;
+}
+.rv-cap-ic { color: var(--accent); }
+.rv-cap-ic * { stroke: var(--bg); }
+.rv-cap-def .rv-cap-ic { color: var(--ok); }
+.rv-cap-net .rv-cap-ic { color: var(--cyber-cyan); }
+.rv-cap-dev .rv-cap-ic { color: var(--warn); }
+.rv-cap-top h3 { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; }
+
+/* chips like the `developer` badge: tint fill, no border */
+.rv-chips li {
+  border: none;
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--text);
+  padding: 3px 8px;
+}
+.rv-cap-def .rv-chips li { background: color-mix(in srgb, var(--ok) 14%, transparent); }
+.rv-cap-net .rv-chips li { background: color-mix(in srgb, var(--cyber-cyan) 13%, transparent); }
+.rv-cap-dev .rv-chips li { background: color-mix(in srgb, var(--warn) 14%, transparent); }
+
+.rv-more { font-family: var(--pixel); font-size: 0.7rem; }
+
+/* ---- timeline: square pixel nodes, dotted rail ---- */
+body[data-terminal="off"] .rv-node::before {
+  width: 2px;
+  background: repeating-linear-gradient(var(--hard-border) 0 4px, transparent 4px 8px);
+}
+body[data-terminal="off"] .rv-node::after {
+  border-radius: 0;
+  width: 14px; height: 14px;
+  left: 7px;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* ---- certs + writeups tables ---- */
+.cert-table,
+.writeup-table {
+  position: relative;
+  overflow: visible;
+  border-color: var(--hard-border);
+  background: var(--bg);
+}
+.cert-table::after,
+.writeup-table::after {
+  content: "";
+  position: absolute; z-index: -1;
+  inset: 6px -6px -6px 6px;
+  pointer-events: none;
+  background-image: repeating-conic-gradient(var(--dither) 0 25%, transparent 0 50%);
+  background-size: var(--dither-size) var(--dither-size);
+}
+.cert-head,
+.wt-head {
+  background: var(--tint-2) !important;
+  font-family: var(--pixel) !important;
+  font-size: 0.64rem !important;
+  letter-spacing: 0.04em;
+  color: var(--text) !important;
+  border-bottom-color: var(--hard-border) !important;
+}
+/* solid row fill, matching the project cards — the table fades in with a
+   transform, which stacks the dither above the table's own background */
+.cert-table .cert-row,
+.writeup-table .wt-row { background: var(--surface); }
+.cert-table .cert-row:not(.cert-head):hover,
+.writeup-table a.wt-row:hover { background: var(--tint); }
+.wt-row .tag, .wt-row [class*="diff"], .wt-row [class*="os-"] { border-radius: 0; }
