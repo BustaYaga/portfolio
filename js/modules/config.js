@@ -10,6 +10,8 @@ export const GITHUB_REPO = {
 
 export const WRITEUP_STATUS = {
   layover: 'locked',
+  stream: 'locked',
+  touch: 'locked',
   kobold: 'missing',
 };
 

